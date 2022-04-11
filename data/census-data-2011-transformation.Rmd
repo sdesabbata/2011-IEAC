@@ -1,0 +1,202 @@
+---
+title: "Census data transformation"
+author: "Stefano De Sabbata"
+date: "`r lubridate::now()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(magrittr)
+library(pastecs)
+library(moments)
+```
+
+## Data
+
+```{r data}
+census_data <- read_csv("../storage/dati-cpa_2011_all.csv")
+```
+
+## Missing values
+
+Check missing values.
+
+```{r}
+census_data %>% 
+  select(P1:E31) %>% 
+  stat.desc() %>% 
+  rownames_to_column() %>% 
+  filter(rowname %in% c("nbr.na")) %>% 
+  pivot_longer(-rowname, names_to = "variable", values_to = "values") %>% 
+  pivot_wider(names_from = "rowname", values_from = "values")
+```
+
+```{r}
+census_data_na <-
+  census_data %>% 
+  filter(if_any(P1:E31, ~is.na(.)))
+
+census_data_na %>% 
+  group_by(REGIONE, PROVINCIA) %>% 
+  count(sort = TRUE) %>% 
+  ungroup() %>% 
+  slice_max(order_by = n, n = 10)
+```
+
+There seem to be 2,400 enumeration areas without information for `E5`, `E6` and `E7`. Those will be removed.
+
+```{r}
+census_data_no_na <-
+  census_data %>% 
+  filter(if_any(P1:E31, ~!is.na(.)))
+```
+
+
+## Normalisation
+
+Normalise data based on their totals. Assign zero where the total for that area is zero.
+
+```{r normalisation}
+census_data_norm <-
+  census_data_no_na %>% 
+  # Popolazione residente
+  mutate(across(P2:P140, function(x){if_else(P1 == 0, 0, x / P1)})) %>% 
+  dplyr::rename_with(
+    function(x){ paste0(x, "_norm") },
+    P2:P140
+  ) %>% 
+  # Stranieri
+  # ST13 and ST14 removed as almost always zero
+  # ST15 removed as almost always one or zero
+  select(-ST13, -ST14, -ST15) %>% 
+  mutate(across(ST2:ST12, function(x){if_else(ST1 == 0, 0, x / ST1)})) %>%
+  dplyr::rename_with(
+    function(x){ paste0(x, "_norm") },
+    ST2:ST12
+  ) %>% 
+  # Abitazioni
+  # Sum all A2 to A7 values for normalisation then remove
+  # A7 also removed as almost always zero
+  mutate(A1_guess = A2 + A3 + A5 + A6 + A7) %>% 
+  mutate(across(A2:A6, function(x){if_else(A1_guess == 0, 0, x / A1_guess)})) %>% 
+  dplyr::rename_with(
+    function(x){ paste0(x, "_norm") },
+    A2:A6
+  ) %>% 
+  select(-A1_guess, -A7) %>% 
+  # Famiglie
+  mutate(across(A46:A48, function(x){if_else(PF1 == 0, 0, x / PF1)})) %>% 
+  dplyr::rename_with(
+    function(x){ paste0(x, "_norm") },
+    A46:A48
+  ) %>% 
+  # Famiglie
+  mutate(across(PF2:PF9, function(x){if_else(PF1 == 0, 0, x / PF1)})) %>% 
+  dplyr::rename_with(
+    function(x){ paste0(x, "_norm") },
+    PF2:PF9
+  ) %>% 
+  # Edifici
+  # E2 not normalised as the vast majority of buildings are used
+  # and normalisation results in a very long left tail, not used
+  select(-E2) %>% 
+  mutate(across(E3:E31, function(x){if_else(E1 == 0, 0, x / E1)})) %>% 
+  dplyr::rename_with(
+    function(x){ paste0(x, "_norm") },
+    E3:E31
+  )
+```
+
+Double-check missing values and `NaN`.
+
+```{r}
+census_data_norm %>% 
+  filter(if_any(P1:E31_norm, ~is.na(.)))
+
+census_data_norm %>% 
+  filter(if_any(P1:E31_norm, ~is.nan(.)))
+```
+
+No missing values nor `NaN`.
+
+
+
+## Skewness
+
+```{r}
+census_data_norm_skewness <-
+  census_data_norm %>% 
+  select(P1:E31_norm) %>% 
+  summarise(across(P1:E31_norm, skewness)) %>% 
+  pivot_longer(P1:E31_norm, names_to = "variable", values_to = "skewness")
+
+census_data_norm_skewness %>% 
+  arrange(-skewness)
+```
+
+Apply a `log10` transformation to all variables with skewness above 2.
+
+```{r}
+skewed_vars <-
+  census_data_norm_skewness %>% 
+  filter(skewness > 2) %>% 
+  pull(variable)
+
+census_data_norm_unskewed <-
+  census_data_norm %>% 
+  mutate(
+    across(
+      all_of(skewed_vars),
+      # use a small value 0.001 to avoid -Inf 
+      function(x)(log10(x+0.001))
+    )
+  ) %>% 
+  dplyr::rename_with(
+    function(x){ paste0(x, "_log10") },
+    all_of(skewed_vars)
+  )
+```
+
+```{r}
+census_data_norm_unskewed %>% 
+  select(P1_log10:E31_norm_log10) %>% 
+  summarise(across(P1_log10:E31_norm_log10, skewness)) %>% 
+  pivot_longer(P1_log10:E31_norm_log10, names_to = "variable", values_to = "skewness") %>% 
+  arrange(-skewness)
+```
+
+
+## Standardisation
+
+```{r}
+census_data_norm_unskewed_std <-
+  census_data_norm_unskewed %>% 
+  mutate(
+    across(
+      P1_log10:E31_norm_log10,
+      function(x){ scale(x) %>% as.vector() }
+    )
+  ) %>% 
+  dplyr::rename_with(
+    function(x){ paste0(x, "_std") },
+    P1_log10:E31_norm_log10
+  )
+```
+
+
+## Save new values
+
+```{r}
+colnames(census_data_norm_unskewed_std)
+```
+
+```{r}
+census_data_norm_unskewed_std %>% 
+  write_csv("../storage/dati-cpa_2011_all-trans.csv")
+```
+
