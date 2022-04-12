@@ -200,8 +200,6 @@ census_data <-
 
 ### Population
 
-About 4.8% of enumeration areas have population zero, and about 10% have less than 10 residents.
-
 ```{r}
 census_data %>% 
   filter(P1 == 0) %>% 
@@ -209,9 +207,16 @@ census_data %>%
   mutate(prop = (n / nrow(census_data))*100)
 
 census_data %>% 
-  filter(P1 > 0 & P1<=10) %>% 
+  filter(P1 > 0 & P1 <= 10) %>% 
   count() %>% 
   mutate(prop = (n / nrow(census_data))*100)
+
+census_data %>% 
+  mutate(small_area = if_else(P1 <= 10, "small", "not small")) %>% 
+  group_by(small_area) %>% 
+  summarise(P1 = sum(P1)) %>% 
+  ungroup() %>% 
+  mutate(P1pc = (P1 / sum(P1)) * 100)
 
 census_data %>% 
   filter(P1 > 0) %>% 
@@ -220,13 +225,24 @@ census_data %>%
   scale_x_log10()
 ```
 
+About 4.8% of enumeration areas have population zero, and about 11.2% have less than 10 residents. Overall, those enumeration areas include about 0.36% of the population. There is an ethical question about whether such areas should be part of a classification. Moreover, these might generate noise in the classification. 
+
+As such, they will be discarded for the time being. The 10-resident threshold is very arbitrary and should be discussed.
+
+```{r}
+census_data_not_small <-
+  census_data %>% 
+  filter(P1 > 0)
+```
+
+
 
 ### Missing values
 
 Check missing values.
 
 ```{r}
-census_data %>% 
+census_data_not_small %>% 
   select(P1:E31) %>% 
   stat.desc() %>% 
   rownames_to_column() %>% 
@@ -238,7 +254,7 @@ census_data %>%
 
 ```{r}
 census_data_na <-
-  census_data %>% 
+  census_data_not_small %>% 
   filter(if_any(P1:E31, ~is.na(.)))
 
 census_data_na %>% 
@@ -252,7 +268,7 @@ There seem to be 2,400 enumeration areas without information for `E5`, `E6` and 
 
 ```{r}
 census_data_no_na <-
-  census_data %>% 
+  census_data_not_small %>% 
   filter(if_any(P1:E31, ~!is.na(.)))
 ```
 
@@ -268,7 +284,7 @@ census_data_no_na %>%
   pivot_longer(everything(), names_to = "variable", values_to = "value") %>% 
   filter(value == 0) %>% 
   count(variable) %>% 
-  mutate(perc = (n / nrow(census_data))*100) %>% 
+  mutate(perc = (n / nrow(census_data_not_small))*100) %>% 
   kable()
 ```
 
@@ -647,7 +663,7 @@ colnames(census_data_norm_unskewed_std)
 
 ```{r}
 census_data_norm_unskewed_std %>% 
-  write_csv("../storage/dati-cpa_2011_all-trans-v0_0_2.csv")
+  write_csv("../storage/dati-cpa_2011_all-trans-v0_0_3.csv")
 ```
 
 
