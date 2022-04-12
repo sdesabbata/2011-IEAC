@@ -136,15 +136,26 @@ census_data_norm_skewness <-
   pivot_longer(P1:E31_norm, names_to = "variable", values_to = "skewness")
 
 census_data_norm_skewness %>% 
-  arrange(-skewness)
+  slice_max(order_by = skewness, n = 10)
+
+census_data_norm_skewness %>% 
+  slice_min(order_by = skewness, n = 10)
 ```
 
-Apply a `log10` transformation to all variables with skewness above 2.
+```{r}
+census_data_norm %>% pull(ST1) %>% hist()
+census_data_norm %>% pull(P59_norm) %>% hist()
+census_data_norm %>% pull(A5_norm) %>% hist()
+census_data_norm %>% pull(P13_norm) %>% hist()
+```
+
+
+Apply a `log10` transformation to all variables with skewness above 2 or below -2.
 
 ```{r}
 skewed_vars <-
   census_data_norm_skewness %>% 
-  filter(skewness > 2) %>% 
+  filter(skewness > 2 | skewness < -2) %>% 
   pull(variable)
 
 census_data_norm_unskewed <-
@@ -152,8 +163,8 @@ census_data_norm_unskewed <-
   mutate(
     across(
       all_of(skewed_vars),
-      # use a small value 0.001 to avoid -Inf 
-      function(x)(log10(x+0.001))
+      # use +1 to shift the log10 curve
+      function(x)(log10(x+1))
     )
   ) %>% 
   dplyr::rename_with(
@@ -167,9 +178,21 @@ census_data_norm_unskewed %>%
   select(P1_log10:E31_norm_log10) %>% 
   summarise(across(P1_log10:E31_norm_log10, skewness)) %>% 
   pivot_longer(P1_log10:E31_norm_log10, names_to = "variable", values_to = "skewness") %>% 
-  arrange(-skewness)
+  slice_max(order_by = skewness, n = 10)
+
+census_data_norm_unskewed %>% 
+  select(P1_log10:E31_norm_log10) %>% 
+  summarise(across(P1_log10:E31_norm_log10, skewness)) %>% 
+  pivot_longer(P1_log10:E31_norm_log10, names_to = "variable", values_to = "skewness") %>% 
+  slice_min(order_by = skewness, n = 10)
 ```
 
+```{r}
+census_data_norm_unskewed %>% pull(ST1_log10) %>% hist()
+census_data_norm_unskewed %>% pull(P59_norm_log10) %>% hist()
+census_data_norm_unskewed %>% pull(A5_norm_log10) %>% hist()
+census_data_norm_unskewed %>% pull(P13_norm_log10) %>% hist()
+```
 
 ## Standardisation
 
@@ -188,6 +211,7 @@ census_data_norm_unskewed_std <-
   )
 ```
 
+There is still a lot of very skewed variables. Those will probably need to be combined or dropped. 
 
 ## Save new values
 
@@ -197,6 +221,6 @@ colnames(census_data_norm_unskewed_std)
 
 ```{r}
 census_data_norm_unskewed_std %>% 
-  write_csv("../storage/dati-cpa_2011_all-trans.csv")
+  write_csv("../storage/dati-cpa_2011_all-trans-v0_0_1.csv")
 ```
 
