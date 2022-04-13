@@ -1,0 +1,177 @@
+---
+title: "Classification variable selection"
+author: "Stefano De Sabbata"
+date: "`r lubridate::now()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This is a **draft**, the analysis is still on-going.
+
+This document focuses on exploring the relationship between the census variables.
+
+
+## Setup
+
+```{r libraries, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(magrittr)
+library(knitr)
+library(GGally)
+```
+
+
+
+## Data
+
+Load the [transformed census data](100-prep/101-census-data-2011-transformation.html).
+
+```{r}
+census_data_trans <-
+  read_csv(
+    "../storage/dati-cpa_2011_all-trans-v0_0_3.csv",
+    col_types = paste(c(rep("c", 12), rep("d", 125)), collapse="")
+  )
+```
+
+
+
+## Correlations
+
+Calculate the correlation between the transformed variables to identify those that might be excluded from the analysis.
+
+```{r}
+candidate_vars <- 
+  census_data_trans %>% 
+  select(P1_norm_log10_std:E30_E31_norm_log10_std) %>% 
+  colnames()
+
+candidate_vars_cor <- NA
+
+for (i in 1:(length(candidate_vars) - 1)) {
+  for(j in (i + 1):length(candidate_vars)) {
+    #cat("Calculating correlation between", candidate_vars[i], "and", candidate_vars[j],"\n")
+    census_data_trans_sample <-
+      census_data_trans %>% 
+      slice_sample(prop = 0.01)
+    ij_cor_test <- cor.test(
+      census_data_trans_sample %>% pull(candidate_vars[i]), 
+      census_data_trans_sample %>% pull(candidate_vars[j]), 
+      method = "kendall"
+    )
+    if(i == 1 & j == 2){
+      candidate_vars_cor <-
+        tibble(
+          var_i = candidate_vars[i],
+          var_j = candidate_vars[j],
+          estimate = ij_cor_test %$% estimate %>% as.numeric(),
+          p_value = ij_cor_test %$% p.value %>% as.numeric()
+        )
+    } else {
+      candidate_vars_cor <-
+        candidate_vars_cor %>% 
+        add_row(
+          var_i = candidate_vars[i],
+          var_j = candidate_vars[j],
+          estimate = ij_cor_test %$% estimate %>% as.numeric(),
+          p_value = ij_cor_test %$% p.value %>% as.numeric()
+        )
+    }
+  }
+}
+```
+
+Further explore the most highly correlated variables.
+
+```{r}
+correlations_cutoff_p_value <- 0.01
+correlations_cutoff_estimate <- 0.5
+
+candidate_vars_cor %>% 
+  filter(
+    p_value < correlations_cutoff_p_value & 
+    estimate > correlations_cutoff_estimate
+  ) %>% 
+  kable()
+```
+
+```{r}
+correlations_to_explore <-
+  c(
+    candidate_vars_cor %>% 
+      filter(
+        p_value < correlations_cutoff_p_value & 
+        estimate > correlations_cutoff_estimate
+      ) %>% 
+      pull(var_i),
+    candidate_vars_cor %>% 
+      filter(
+        p_value < correlations_cutoff_p_value & 
+        estimate > correlations_cutoff_estimate
+      ) %>% 
+      pull(var_j)
+  ) %>% 
+  unique()
+
+correlations_to_explore_panel <-
+  census_data_trans %>%
+  slice_sample(prop = 0.01) %>% 
+  select({{correlations_to_explore}}) %>%
+  ggpairs(
+    upper = list(continuous = wrap(ggally_cor, method = "kendall")),
+    lower = list(continuous = wrap("points", alpha = 0.3, size=0.1))
+  )
+```
+
+```{r, fig.height=10, fig.width=10}
+print(correlations_to_explore_panel)
+
+# ggsave(
+#   "../100-prep/111-classification-variable-selection-top-correlations.png", 
+#   correlations_to_explore_panel,
+#   width = 600,
+#   height = 600,
+#   units = "mm",
+#   dpi=300
+# )
+```
+
+The figure below is an annotated version of the plot above.
+
+![](../100-prep/111-classification-variable-selection-top-correlations.png)
+
+| Variable code | Variable description                                                                       |
+|---------------|--------------------------------------------------------------------------------------------|
+| P1            | Popolazione residente - totale                                                             |
+| P2            | Popolazione residente - maschi                                                             |
+| P53           | Popolazione residente - maschi di 6 anni e più                                             |
+| P60           | Popolazione residente - totale di 15 anni e più appartenente alle forze   di lavoro totale |
+| P61           | Popolazione residente - totale di 15 anni e più occupata (FL)                              |
+| P64           | Popolazione residente - maschi di 15 anni e più appartenente alle forze   di lavoro        |
+| P65           | Popolazione residente - maschi di 15 anni e più occupata (FL)                              |
+| A3            | Abitazioni vuote e abitazioni occupate solo da persone non residenti                       |
+| A5            | Altri tipi di alloggio occupati                                                            |
+| A6            | Abitazioni vuote                                                                           |
+| A7            | Abitazioni occupate solo da persone non residenti                                          |
+| A44           | Superficie delle abitazioni occupate da almeno una persona residente                       |
+| PF1           | Famiglie residenti - totale                                                                |
+| E25           | Edifici ad uso residenziale da 9 a 15 interni                                              |
+| E26           | Edifici ad uso residenziale con 16 interni o più                                           |
+| E27           | Totale interni in edifici ad uso residenziale                                              |
+
+
+
+## Conclusions
+
+This is a **draft**, the analysis is still on-going.
+
+
+
+## Acknowledgements
+
+This analysis uses data from [ISTAT](https://www.istat.it/it/archivio/104317) distributed under [CC BY 3.0 IT](https://creativecommons.org/licenses/by/3.0/it/deed.en) (see also [legal notice](https://www.istat.it/it/note-legali)).
