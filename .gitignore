@@ -42,5 +42,7 @@ vignettes/*.pdf
 .DS_Store
 */.DS_Store
 
-# Storage folder
+# Storage folder and other
 storage
+docker/docker_start_RStudio.sh
+docker/docker_stop_RStudio.sh

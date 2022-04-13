@@ -1,0 +1,1 @@
+docker stop r-for-2011-ieac-rstudio
