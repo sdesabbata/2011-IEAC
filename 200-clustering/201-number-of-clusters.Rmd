@@ -1,0 +1,97 @@
+---
+title: "Determine number of clusters"
+author: "Stefano De Sabbata"
+date: "14/04/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+```{r libraries, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(magrittr)
+library(knitr)
+library(GGally)
+```
+
+
+
+## Data
+
+Load the [selected census variables](100-prep/111-classification-variable-selection.html).
+
+```{r}
+census_data_trans_selected <-
+  read_csv(
+    "../storage/dati-cpa_2011_all-trans-selected-v0_0_3.csv",
+    col_types = paste(c(rep("c", 12), rep("d", 125)), collapse="")
+  )
+```
+
+## Determine number of clusters
+
+```{r}
+# Data for elbow method
+data_for_testing <-
+  census_data_trans_selected %>%
+  dplyr::select(P1_norm_log10_std:E30_E31_norm_log10_std) %>% 
+  slice_sample(prop = 0.01)
+
+# Calculate WCSS and silhouette
+# for k = 2 to 15
+# Set up two vectors where to store
+# the calculated WCSS and silhouette value
+testing_wcss <- rep(NA, 15)
+testing_silhouette <- rep(NA, 15)
+
+# for k = 2 to 15
+for (testing_k in 2:15){
+  cat(testing_k, "\n")
+  
+  # Calculate kmeans
+  kmeans_result <- 
+    stats::kmeans(data_for_testing, centers = testing_k, iter.max = 15)
+  
+  # Extract WCSS
+  # and save it in the vector
+  testing_wcss[testing_k] <- kmeans_result %$% tot.withinss
+  
+  # Calculate average silhouette
+  # and save it in the vector
+  testing_silhouette[testing_k] <- 
+    kmeans_result %$% cluster %>%
+    cluster::silhouette(
+      data_for_testing %>% dist()
+    ) %>%
+    magrittr::extract(, 3) %>% mean()
+}
+
+# Calculate the gap statistic using bootstrapping
+testing_gap <- 
+  cluster::clusGap(data_for_testing, FUN = kmeans, 
+    K.max = 15, B = 15
+  )
+```
+
+### Plots
+
+```{r}
+plot(2:15, testing_wcss[2:15], type="b", xlab="Number of Clusters", 
+     ylab="WCSS", xlim=c(1,15)) +
+abline(v = 3, col = "red") +
+abline(v = 6, col = "red")
+
+plot(2:15, testing_silhouette[2:15], type="b", xlab="Number of Clusters", 
+     ylab="Silhouette", xlim=c(1,15)) +
+abline(v = 3, col = "red") +
+abline(v = 6, col = "red")
+
+plot(2:15, testing_gap[["Tab"]][2:15, "gap"], type="b", xlab="Number of Clusters", 
+     ylab="Gap", xlim=c(1,15)) +
+abline(v = 3, col = "red") +
+abline(v = 6, col = "red")
+```
