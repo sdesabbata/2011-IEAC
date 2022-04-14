@@ -49,3 +49,4 @@ docker/docker_stop_RStudio.sh
 docker/docker_gitconfig.sh
 shinyapps/shinyapps_setup.R
 *.dcf
+*/rsconnect

@@ -14,6 +14,8 @@
 # https://community.rstudio.com/t/how-to-plot-leaflet-map-in-shiny-mainpanel/107079/3
 
 library(shiny)
+library(tidyverse)
+library(sf)
 library(leaflet)
 
 ui <- fluidPage(
