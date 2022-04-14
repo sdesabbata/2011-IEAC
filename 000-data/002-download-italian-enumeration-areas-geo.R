@@ -99,7 +99,22 @@ for (region_id in 1:20) {
 
 # Save the dataset as geojson
 
-enum_areas %>%
+enum_areas <-
+  enum_areas %>%
+  select(COD_REG, SEZ2011) %>% 
+  mutate(
+    COD_REG = COD_REG %>% as.integer() %>% as.character(),
+    SEZ2011 = COD_REG %>% as.integer() %>% as.character()
+  )
+
+enum_areas %>% 
+  saveRDS("storage/italian-enumeration-areas-2011.rds")
+
+enum_areas %>% 
   write_sf("storage/italian-enumeration-areas-2011.geojson")
+
+dir.create("storage/italian-enumeration-areas-2011")
+enum_areas %>%
+  write_sf("storage/italian-enumeration-areas-2011/italian-enumeration-areas-2011.shp")
 
 rm(list = ls())

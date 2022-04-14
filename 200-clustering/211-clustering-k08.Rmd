@@ -65,6 +65,7 @@ census_data_ieac_k08_geo <-
   "../storage/italian-enumeration-areas-2011.geojson"
   ) %>% 
   mutate(SEZ2011 = as.character(SEZ2011)) %>% 
+  select(SEZ2011) %>% 
   left_join(
     census_data_ieac_k08 %>% 
     select(SEZ2011, ieac_k08)
@@ -73,6 +74,7 @@ census_data_ieac_k08_geo <-
 census_data_ieac_k08_geo %>% 
   write_sf("../storage/ieac_k08-with-vars-v0_0_3.geojson")
 
+dir.create("../storage/ieac_k08-with-vars-v0_0_3")
 census_data_ieac_k08_geo %>% 
-  write_sf("../storage/ieac_k08-with-vars-v0_0_3.shp")
+  write_sf("../storage/ieac_k08-with-vars-v0_0_3/ieac_k08-with-vars-v0_0_3.shp")
 ```
