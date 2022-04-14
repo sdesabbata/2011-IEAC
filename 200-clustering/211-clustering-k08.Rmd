@@ -1,0 +1,78 @@
+---
+title: "Clustering"
+author: "Stefano De Sabbata"
+date: "`r lubridate::now()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+```{r libraries, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(magrittr)
+library(knitr)
+library(sf)
+```
+
+
+
+## Data
+
+Load the [selected census variables](100-prep/111-classification-variable-selection.html).
+
+```{r}
+census_data_trans_selected <-
+  read_csv(
+    "../storage/dati-cpa_2011_all-trans-selected-v0_0_3.csv",
+    col_types = paste(c(rep("c", 12), rep("d", 125)), collapse="")
+  )
+```
+
+## Clustering
+
+```{r}
+census_data_kmeans_k08 <- 
+  census_data_trans_selected %>%
+  select(P1_norm_log10_std:E30_E31_norm_log10_std) %>%
+  stats::kmeans(
+    centers = 8, iter.max = 5000,
+    algorithm = "Lloyd"
+  )
+
+census_data_ieac_k08 <- 
+  census_data_trans_selected %>%
+  tibble::add_column(
+    ieac_k08 = census_data_kmeans_k08 %$% cluster %>% as.character()
+  )
+```
+
+## Save values
+
+```{r}
+census_data_ieac_k08 %>% 
+  write_csv("../storage/ieac_k08-with-vars-v0_0_3.csv") 
+
+census_data_ieac_k08 %>% 
+  select(CODREG:CODASC, ieac_k08) %>% 
+  write_csv("../storage/ieac_k08-no-vars-v0_0_3.csv") 
+
+census_data_ieac_k08_geo <-
+  read_sf(
+  "../storage/italian-enumeration-areas-2011.geojson"
+  ) %>% 
+  mutate(SEZ2011 = as.character(SEZ2011)) %>% 
+  left_join(
+    census_data_ieac_k08 %>% 
+    select(SEZ2011, ieac_k08)
+  )
+
+census_data_ieac_k08_geo %>% 
+  write_sf("../storage/ieac_k08-with-vars-v0_0_3.geojson")
+
+census_data_ieac_k08_geo %>% 
+  write_sf("../storage/ieac_k08-with-vars-v0_0_3.shp")
+```
