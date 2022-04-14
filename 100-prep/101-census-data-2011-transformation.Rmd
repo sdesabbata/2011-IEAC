@@ -227,13 +227,9 @@ census_data %>%
 
 About 4.8% of enumeration areas have population zero, and about 11.2% have less than 10 residents. Overall, those enumeration areas include about 0.36% of the population. There is an ethical question about whether such areas should be part of a classification. Moreover, these might generate noise in the classification. 
 
-As such, they will be discarded for the time being. The 10-resident threshold is very arbitrary and should be discussed.
+In a preliminary cluster analysis, areas with no residents had been discarded.
 
-```{r}
-census_data_not_small <-
-  census_data %>% 
-  filter(P1 > 0)
-```
+[After further investigation and discussion](https://github.com/sdesabbata/2011-IEAC/issues/1), it seems that those areas are actually mostly industrial areas, which might be of interest as a cluster on its own right. As such all areas will be retained.
 
 
 
@@ -242,7 +238,7 @@ census_data_not_small <-
 Check missing values.
 
 ```{r}
-census_data_not_small %>% 
+census_data %>% 
   select(P1:E31) %>% 
   stat.desc() %>% 
   rownames_to_column() %>% 
@@ -254,7 +250,7 @@ census_data_not_small %>%
 
 ```{r}
 census_data_na <-
-  census_data_not_small %>% 
+  census_data %>% 
   filter(if_any(P1:E31, ~is.na(.)))
 
 census_data_na %>% 
@@ -268,7 +264,7 @@ There seem to be 2,400 enumeration areas without information for `E5`, `E6` and 
 
 ```{r}
 census_data_no_na <-
-  census_data_not_small %>% 
+  census_data %>% 
   filter(if_any(P1:E31, ~!is.na(.)))
 ```
 
@@ -284,7 +280,7 @@ census_data_no_na %>%
   pivot_longer(everything(), names_to = "variable", values_to = "value") %>% 
   filter(value == 0) %>% 
   count(variable) %>% 
-  mutate(perc = (n / nrow(census_data_not_small))*100) %>% 
+  mutate(perc = (n / nrow(census_data))*100) %>% 
   kable()
 ```
 
