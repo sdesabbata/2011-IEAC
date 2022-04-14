@@ -160,15 +160,65 @@ The figure below is an annotated version of the plot above.
 | A7            | Abitazioni occupate solo da persone non residenti                                          |
 | A44           | Superficie delle abitazioni occupate da almeno una persona residente                       |
 | PF1           | Famiglie residenti - totale                                                                |
+| E24           | Edifici ad uso residenziale da   5 a 8 interni                                             |
 | E25           | Edifici ad uso residenziale da 9 a 15 interni                                              |
 | E26           | Edifici ad uso residenziale con 16 interni o più                                           |
 | E27           | Totale interni in edifici ad uso residenziale                                              |
 
+## Variable selection
+
+Based on the correlations illustrated above:
+
+- Retain transformed **P1** (Popolazione residente - totale)
+    - Remove highly correlated transformed variables
+        - **A44** (Superficie delle abitazioni occupate da almeno una persona residente)
+            - *Note: not a linear relationship, might be worth retaining*
+        - **PF1** (Famiglie residenti - totale)
+- Retain transformed **P2** (Popolazione residente - maschi)
+    - Remove highly correlated transformed variable
+        - **P53** (Popolazione residente - maschi di 6 anni e più)
+- Retain transformed **P60** (Popolazione residente - totale di 15 anni e più appartenente alle forze   di lavoro totale)
+    - Remove highly correlated transformed variable
+        - **P61** (Popolazione residente - totale di 15 anni e più occupata (FL))
+            - *Note: might be worth retaining or change normalisation of P61 using P60 as normalising variable*
+- Retain transformed **P64** (Popolazione residente - maschi di 15 anni e più appartenente alle forze   di lavoro)
+    - Remove highly correlated transformed variable
+        - **P65** (Popolazione residente - maschi di 15 anni e più occupata (FL))
+            - *Note: might be worth retaining or change normalisation of P65 using P64 as normalising variable*
+- Retain transformed **A3** (Abitazioni vuote e abitazioni occupate solo da persone non residenti)
+    - Remove highly correlated transformed variable
+        - **A5_A6_A7** composed of A5 (Altri tipi di alloggio occupati), A6 (Abitazioni vuote) and A7 (Abitazioni occupate solo da persone non residenti)
+            - *Note: might be worth aggregating A3 along with A5, A6 and A7*
+- Retain transformed **E24_E25_E26**, coposed of E24 (Edifici ad uso residenziale da   5 a 8 interni), E25  (Edifici ad uso residenziale da 9 a 15 interni) and E26 (Edifici ad uso residenziale con 16 interni o più)
+    - Remove highly correlated transformed variable
+        - **E27** (Totale interni in edifici ad uso residenziale)
+            - *Note: might be worth changing normalisation of E21 to E26 using E27 as normalising variable*
+
+## Save values
+
+```{r}
+census_data_trans_selected <-
+  census_data_trans %>% 
+  select(
+    -A44_norm_log10_std, -PF1_norm_log10_std, -P53_norm_std, 
+    -P61_norm_std, -P65_norm_std, -A5_A6_A7_norm_std, 
+    -E27_norm_log10_std
+  )
+
+colnames(census_data_trans_selected)
+```
+
+```{r}
+census_data_trans_selected %>% 
+  write_csv("../storage/dati-cpa_2011_all-trans-selected-v0_0_3.csv") 
+```
 
 
 ## Conclusions
 
 This is a **draft**, the analysis is still on-going.
+
+The notes in the **Variable selection** section above need to be revised and the trasnformation process updated accordingly.
 
 
 

@@ -46,3 +46,4 @@ vignettes/*.pdf
 storage
 docker/docker_start_RStudio.sh
 docker/docker_stop_RStudio.sh
+docker/docker_gitconfig.sh
