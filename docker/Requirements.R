@@ -22,6 +22,7 @@ install.packages("neuralnet")
 install.packages("kernlab")
 install.packages("ROCR")
 install.packages("pROC")
+install.packages("rsconnect")
 
 # dev libs
 install.packages("devtools")
