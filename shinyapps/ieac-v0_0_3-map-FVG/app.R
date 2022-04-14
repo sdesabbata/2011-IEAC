@@ -22,7 +22,8 @@ ui <- fluidPage(
   titlePanel("2011 IEAC v0.0.3"),
   mainPanel(
     div("Still very much a work in progress! :)"),
-    leafletOutput("ieac_map", height="90vh", width="90vh")
+    div("(it takes a few seconds to load)"),
+    leafletOutput("ieac_map", height="80vh", width="90vh")
   )
 )
 
