@@ -166,7 +166,7 @@ pre code {
 
 <h1 class="title toc-ignore">Clustering</h1>
 <h4 class="author">Stefano De Sabbata</h4>
-<h4 class="date">2022-04-14 17:41:04</h4>
+<h4 class="date">2022-04-14 20:42:27</h4>
 
 </div>
 
@@ -212,18 +212,18 @@ census_data_ieac_k08 %&gt;%
   select(CODREG:CODASC, ieac_k08) %&gt;% 
   write_csv(&quot;../storage/ieac_k08-no-vars-v0_0_3.csv&quot;) 
 
+enum_areas &lt;- readRDS( &quot;../storage/italian-enumeration-areas-2011.rds&quot;)
 census_data_ieac_k08_geo &lt;-
-  read_sf(
-  &quot;../storage/italian-enumeration-areas-2011.geojson&quot;
-  ) %&gt;% 
-  mutate(SEZ2011 = as.character(SEZ2011)) %&gt;% 
-  select(SEZ2011) %&gt;% 
+  enum_areas %&gt;%
   left_join(
     census_data_ieac_k08 %&gt;% 
-    select(SEZ2011, ieac_k08)
+    select(CODREG:CODASC, ieac_k08)
   )</code></pre>
 <pre><code>## Joining, by = &quot;SEZ2011&quot;</code></pre>
 <pre class="r"><code>census_data_ieac_k08_geo %&gt;% 
+  saveRDS(&quot;../storage/ieac_k08-with-vars-v0_0_3.rds&quot;)
+
+census_data_ieac_k08_geo %&gt;% 
   write_sf(&quot;../storage/ieac_k08-with-vars-v0_0_3.geojson&quot;)
 
 dir.create(&quot;../storage/ieac_k08-with-vars-v0_0_3&quot;)

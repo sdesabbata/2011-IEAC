@@ -103,8 +103,8 @@ enum_areas <-
   enum_areas %>%
   select(COD_REG, SEZ2011) %>% 
   mutate(
-    COD_REG = COD_REG %>% as.integer() %>% as.character(),
-    SEZ2011 = COD_REG %>% as.integer() %>% as.character()
+    COD_REG = COD_REG %>% as.character(),
+    SEZ2011 = SEZ2011 %>% as.character()
   )
 
 enum_areas %>% 
