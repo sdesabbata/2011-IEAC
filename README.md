@@ -15,3 +15,7 @@ Still very much a work in progress! :sweat_smile:
 - Result
     - Check out the [Shiny interactive map demo for Friuli-Venezia Giulia](https://sdesabbata.shinyapps.io/ieac-v0_0_3-map-fvg/) 
         - *(it takes a few seconds to load)*
+        
+## Reproducibility
+
+All the code is available in the [2011-IEAC repository](https://github.com/sdesabbata/2011-IEAC) and it was compiled using the [sdesabbata/r-for-2011-ieac docker image](https://hub.docker.com/r/sdesabbata/r-for-2011-ieac).

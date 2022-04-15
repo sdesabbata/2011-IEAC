@@ -1,0 +1,141 @@
+﻿Check,Variable code,Variable description,Normalisation code,Normalisation description
+y,P1,Popolazione residente - totale,,Area (Km2)
+removed,P2,Popolazione residente - maschi,P3,Popolazione residente - femmine
+y,P3,Popolazione residente - femmine,P2,Popolazione residente - maschi
+y,P4,Popolazione residente - celibi/nubili,P1,Popolazione residente - totale
+y,P5,Popolazione residente - coniugati/e (+ separati/e di fatto),P1,Popolazione residente - totale
+y,P6,Popolazione residente - separati/e legalmente,P1,Popolazione residente - totale
+y,P7,Popolazione residente - vedovi/e,P1,Popolazione residente - totale
+y,P8,Popolazione residente - divorziati/e,P1,Popolazione residente - totale
+y,P9,Popolazione residente - maschi celibi,P4,Popolazione residente - celibi/nubili
+y,P10,Popolazione residente - maschi coniugati o separati di fatto,P5,Popolazione residente - coniugati/e (+ separati/e di fatto)
+y,P11,Popolazione residente - maschi separati legalmente,P6,Popolazione residente - separati/e legalmente
+y,P12,Popolazione residente - maschi vedovi,P7,Popolazione residente - vedovi/e
+y,P13,Popolazione residente - maschi divorziati,P8,Popolazione residente - divorziati/e
+y,P14,Popolazione residente - età < 5 anni,P1,Popolazione residente - totale
+y,P15,Popolazione residente - età 5 - 9 anni,P1,Popolazione residente - totale
+y,P16,Popolazione residente - età 10 - 14 anni,P1,Popolazione residente - totale
+y,P17,Popolazione residente - età 15 - 19 anni,P1,Popolazione residente - totale
+y,P18,Popolazione residente - età 20 - 24 anni,P1,Popolazione residente - totale
+y,P19,Popolazione residente - età 25 - 29 anni,P1,Popolazione residente - totale
+y,P20,Popolazione residente - età 30 - 34 anni,P1,Popolazione residente - totale
+y,P21,Popolazione residente - età 35 - 39 anni,P1,Popolazione residente - totale
+y,P22,Popolazione residente - età 40 - 44 anni,P1,Popolazione residente - totale
+y,P23,Popolazione residente - età 45 - 49 anni,P1,Popolazione residente - totale
+y,P24,Popolazione residente - età 50 - 54 anni,P1,Popolazione residente - totale
+y,P25,Popolazione residente - età 55 - 59 anni,P1,Popolazione residente - totale
+y,P26,Popolazione residente - età 60 - 64 anni,P1,Popolazione residente - totale
+y,P27,Popolazione residente - età 65 - 69 anni,P1,Popolazione residente - totale
+y,P28,Popolazione residente - età 70 - 74 anni,P1,Popolazione residente - totale
+y,P29,Popolazione residente - età > 74 anni,P1,Popolazione residente - totale
+y,P30,Popolazione residente - maschi - età < 5 anni,P14,Popolazione residente - età < 5 anni
+y,P31,Popolazione residente - maschi - età 5 - 9 anni,P15,Popolazione residente - età 5 - 9 anni
+y,P32,Popolazione residente - maschi - età 10 - 14 anni,P16,Popolazione residente - età 10 - 14 anni
+y,P33,Popolazione residente - maschi - età 15 - 19 anni,P17,Popolazione residente - età 15 - 19 anni
+y,P34,Popolazione residente - maschi - età 20 - 24 anni,P18,Popolazione residente - età 20 - 24 anni
+y,P35,Popolazione residente - maschi - età 25 - 29 anni,P19,Popolazione residente - età 25 - 29 anni
+y,P36,Popolazione residente - maschi - età 30 - 34 anni,P20,Popolazione residente - età 30 - 34 anni
+y,P37,Popolazione residente - maschi - età 35 - 39 anni,P21,Popolazione residente - età 35 - 39 anni
+y,P38,Popolazione residente - maschi - età 40 - 44 anni,P22,Popolazione residente - età 40 - 44 anni
+y,P39,Popolazione residente - maschi - età 45 - 49 anni,P23,Popolazione residente - età 45 - 49 anni
+y,P40,Popolazione residente - maschi - età 50 - 54 anni,P24,Popolazione residente - età 50 - 54 anni
+y,P41,Popolazione residente - maschi - età 55 - 59 anni,P25,Popolazione residente - età 55 - 59 anni
+y,P42,Popolazione residente - maschi - età 60 - 64 anni,P26,Popolazione residente - età 60 - 64 anni
+y,P43,Popolazione residente - maschi - età 65 - 69 anni,P27,Popolazione residente - età 65 - 69 anni
+y,P44,Popolazione residente - maschi - età 70 - 74 anni,P28,Popolazione residente - età 70 - 74 anni
+y,P45,Popolazione residente - maschi - età > 74 anni,P29,Popolazione residente - età > 74 anni
+y,P46,Popolazione residente - totale di 6 anni e più,P1,Popolazione residente - totale
+y,P47,Popolazione residente con laurea vecchio e nuovo ordinamento + diplomi universitari + diplomi terziari di tipo non universitario vecchio e nuovo ordinamento,P46,Popolazione residente - totale di 6 anni e più
+y,P48,Popolazione residente con diploma di scuola secondaria superiore (maturità + qualifica),P46,Popolazione residente - totale di 6 anni e più
+y,P49,Popolazione residente con media inferiore,P46,Popolazione residente - totale di 6 anni e più
+y,P50,Popolazione residente con licenza elementare,P46,Popolazione residente - totale di 6 anni e più
+y,P51,Popolazione residente - alfabeti,P46,Popolazione residente - totale di 6 anni e più
+y,P52,Popolazione residente - analfabeti,P46,Popolazione residente - totale di 6 anni e più
+y,P53,Popolazione residente - maschi di 6 anni e più,P46,Popolazione residente - totale di 6 anni e più
+y,P54,Popolazione residente - maschi con laurea vecchio e nuovo ordinamento + diplomi universitari + diplomi terziari di tipo non universitario vecchio e nuovo ordinamento,P47,Popolazione residente con laurea vecchio e nuovo ordinamento + diplomi universitari + diplomi terziari di tipo non universitario vecchio e nuovo ordinamento
+y,P55,Popolazione residente - maschi con diploma di scuola secondaria superiore (maturità + qualifica),P48,Popolazione residente con diploma di scuola secondaria superiore (maturità + qualifica)
+y,P56,Popolazione residente - maschi con media inferiore,P49,Popolazione residente con media inferiore
+y,P57,Popolazione residente - maschi con licenza elementare,P50,Popolazione residente con licenza elementare
+y,P58,Popolazione residente - maschi alfabeti,P51,Popolazione residente - alfabeti
+y,P59,Popolazione residente - maschi analfabeti,P52,Popolazione residente - analfabeti
+y,P60,Popolazione residente - totale di 15 anni e più appartenente alle forze di lavoro totale,P17 + ... + P29,
+y,P61,Popolazione residente - totale di 15 anni e più occupata (FL),P60,Popolazione residente - totale di 15 anni e più appartenente alle forze di lavoro totale
+y,P62,Popolazione residente - totale di 15 anni e più disoccupata in cerca nuova occupazione,P60,Popolazione residente - totale di 15 anni e più appartenente alle forze di lavoro totale
+y,P64,Popolazione residente - maschi di 15 anni e più appartenente alle forze di lavoro,P60,Popolazione residente - totale di 15 anni e più appartenente alle forze di lavoro totale
+y,P65,Popolazione residente - maschi di 15 anni e più occupata (FL),P61,Popolazione residente - totale di 15 anni e più occupata (FL)
+y,P66,Popolazione residente - maschi di 15 anni e più disoccupata in cerca nuova occupazione,P62,Popolazione residente - totale di 15 anni e più disoccupata in cerca nuova occupazione
+y,P128,Popolazione residente - totale di 15 anni e più non appartenente alle forze di lavoro (NFL),P60,Popolazione residente - totale di 15 anni e più appartenente alle forze di lavoro totale
+y,P129,Popolazione residente - maschi di 15 anni e più non appartenente alle forze di lavoro (NFL),P128,Popolazione residente - totale di 15 anni e più non appartenente alle forze di lavoro (NFL)
+y,P130,Popolazione residente - totale di 15 anni e più casalinghi/e,P60,Popolazione residente - totale di 15 anni e più appartenente alle forze di lavoro totale
+y,P131,Popolazione residente - totale di 15 anni e più studenti,P60,Popolazione residente - totale di 15 anni e più appartenente alle forze di lavoro totale
+y,P132,Popolazione residente - totale maschi di 15 anni e più studenti,P131,Popolazione residente - totale di 15 anni e più studenti
+y,P135,Popolazione residente - totale di 15 anni e più in altra condizione,P60,Popolazione residente - totale di 15 anni e più appartenente alle forze di lavoro totale
+y,P136,Popolazione residente - totale maschi di 15 anni e più in altra condizione,P135,Popolazione residente - totale di 15 anni e più in altra condizione
+y,P137,Popolazione residente che si sposta giornalmente nel comune di dimora abituale,P1,Popolazione residente - totale
+y,P138,Popolazione residente che si sposta giornalmente fuori del comune di dimora abituale,P1,Popolazione residente - totale
+y,P139,Popolazione residente - totale di 15 anni e più percettori di reddito da lavoro o capitale,P1,Popolazione residente - totale
+y,P140,Popolazione residente - totale maschi di 15 anni e più percettori di reddito da lavoro o capitale,P139,Popolazione residente - totale di 15 anni e più percettori di reddito da lavoro o capitale
+y,ST1,Stranieri e apolidi residenti in Italia - totale,P1,Popolazione residente - totale
+y,ST2,Stranieri e apolidi residenti in Italia - maschi,ST1,Stranieri e apolidi residenti in Italia - totale
+y,ST3,Stranieri e apolidi residenti in Italia - età 0 - 29 anni,ST1,Stranieri e apolidi residenti in Italia - totale
+y,ST4,Stranieri e apolidi residenti in Italia - età 30 - 54 anni,ST1,Stranieri e apolidi residenti in Italia - totale
+y,ST5,Stranieri e apolidi residenti in Italia - età > 54 anni,ST1,Stranieri e apolidi residenti in Italia - totale
+y,ST6,Stranieri e apolidi residenti in Italia - maschi - età 0 - 29 anni,ST3,Stranieri e apolidi residenti in Italia - età 0 - 29 anni
+y,ST7,Stranieri e apolidi residenti in Italia - maschi - età 30 - 54 anni,ST4,Stranieri e apolidi residenti in Italia - età 30 - 54 anni
+y,ST8,Stranieri e apolidi residenti in Italia - maschi - età > 54 anni,ST5,Stranieri e apolidi residenti in Italia - età > 54 anni
+y,ST9,Stranieri residenti in Italia - Europa,ST1,Stranieri e apolidi residenti in Italia - totale
+y,ST10,Stranieri residenti in Italia - Africa,ST1,Stranieri e apolidi residenti in Italia - totale
+y,ST11,Stranieri residenti in Italia - America,ST1,Stranieri e apolidi residenti in Italia - totale
+y,ST12,Stranieri residenti in Italia - Asia,ST1,Stranieri e apolidi residenti in Italia - totale
+y,ST13,Stranieri residenti in Italia - Oceania,ST1,Stranieri e apolidi residenti in Italia - totale
+y,ST14,Apolidi residenti in Italia,ST1,Stranieri e apolidi residenti in Italia - totale
+y,ST15,Stranieri residenti in Italia - totale,ST1,Stranieri e apolidi residenti in Italia - totale
+y,A2,Abitazioni occupate da almeno una persona residente,,Abitazioni (all) ?
+y,A3,Abitazioni vuote e abitazioni occupate solo da persone non residenti,,Abitazioni (all) ?
+y,A5,Altri tipi di alloggio occupati,,Abitazioni (all) ?
+y,A6,Abitazioni vuote,,Abitazioni (all) ?
+y,A7,Abitazioni occupate solo da persone non residenti,,Abitazioni (all) ?
+y,A44,Superficie delle abitazioni occupate da almeno una persona residente,,Area (Km2) ?
+y,A46,Famiglie in alloggi in affitto,A46 + A47 + A48,
+y,A47,Famiglie in alloggi di proprietà,A46 + A47 + A48,
+y,A48,Famiglie che occupano l’alloggio ad altro titolo,A46 + A47 + A48,
+y,PF1,Famiglie residenti - totale,,Area (Km2) ?
+y,PF2,Famiglie residenti - totale componenti,PF1,Famiglie residenti - totale
+y,PF3,Famiglie residenti - 1 componente,PF1,Famiglie residenti - totale
+y,PF4,Famiglie residenti - 2 componenti,PF1,Famiglie residenti - totale
+y,PF5,Famiglie residenti - 3 componenti,PF1,Famiglie residenti - totale
+y,PF6,Famiglie residenti - 4 componenti,PF1,Famiglie residenti - totale
+y,PF7,Famiglie residenti - 5 componenti,PF1,Famiglie residenti - totale
+y,PF8,Famiglie residenti - 6 e oltre componenti,PF1,Famiglie residenti - totale
+removed,PF9,Componenti delle famiglie residenti di 6 e oltre componenti,P1,Popolazione residente - totale
+y,E1,Edifici e complessi di edifici - totale,,Area (Km2)
+removed,E2,Edifici e complessi di edifici utilizzati,E1,Edifici e complessi di edifici - totale
+y,E3,Edifici ad uso residenziale,E1,Edifici e complessi di edifici - totale
+y,E4,"Edifici e complessi di edifici (utilizzati) ad uso produttivo, commerciale, direzionale/terziario, turistico/ricettivo, servizi, altro",E1,Edifici e complessi di edifici - totale
+y,E5,Edifici ad uso residenziale in muratura portante,E3,Edifici ad uso residenziale
+y,E6,Edifici ad uso residenziale in calcestruzzo armato,E3,Edifici ad uso residenziale
+y,E7,"Edifici ad uso residenziale in altro materiale (acciaio, legno, ecc.)",E3,Edifici ad uso residenziale
+y,E8,Edifici ad uso residenziale costruiti prima del 1919,E3,Edifici ad uso residenziale
+y,E9,Edifici ad uso residenziale costruiti dal 1919 al 1945,E3,Edifici ad uso residenziale
+y,E10,Edifici ad uso residenziale costruiti dal 1946 al 1960,E3,Edifici ad uso residenziale
+y,E11,Edifici ad uso residenziale costruiti dal 1961 al 1970,E3,Edifici ad uso residenziale
+y,E12,Edifici ad uso residenziale costruiti dal 1971 al 1980,E3,Edifici ad uso residenziale
+y,E13,Edifici ad uso residenziale costruiti dal 1981 al 1990,E3,Edifici ad uso residenziale
+y,E14,Edifici ad uso residenziale costruiti dal 1991 al 2000,E3,Edifici ad uso residenziale
+y,E15,Edifici ad uso residenziale costruiti dal 2001 al 2005,E3,Edifici ad uso residenziale
+y,E16,Edifici ad uso residenziale costruiti dopo il 2005,E3,Edifici ad uso residenziale
+y,E17,Edifici ad uso residenziale con un piano,E3,Edifici ad uso residenziale
+y,E18,Edifici ad uso residenziale con 2 piani,E3,Edifici ad uso residenziale
+y,E19,Edifici ad uso residenziale con 3 piani,E3,Edifici ad uso residenziale
+y,E20,Edifici ad uso residenziale con 4 piani o più,E3,Edifici ad uso residenziale
+y,E21,Edifici ad uso residenziale con un interno,E3,Edifici ad uso residenziale
+y,E22,Edifici ad uso residenziale con 2 interni,E3,Edifici ad uso residenziale
+y,E23,Edifici ad uso residenziale da 3 a 4 interni,E3,Edifici ad uso residenziale
+y,E24,Edifici ad uso residenziale da 5 a 8 interni,E3,Edifici ad uso residenziale
+y,E25,Edifici ad uso residenziale da 9 a 15 interni,E3,Edifici ad uso residenziale
+y,E26,Edifici ad uso residenziale con 16 interni o più,E3,Edifici ad uso residenziale
+y,E27,Totale interni in edifici ad uso residenziale,E3,Edifici ad uso residenziale
+y,E28,Edifici ad uso residenziale con stato di conservazione ottimo,E3,Edifici ad uso residenziale
+y,E29,Edifici ad uso residenziale con stato di conservazione buono,E3,Edifici ad uso residenziale
+y,E30,Edifici ad uso residenziale con stato di conservazione mediocre,E3,Edifici ad uso residenziale
+y,E31,Edifici ad uso residenziale con stato di conservazione pessimo,E3,Edifici ad uso residenziale

@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-This is a **draft**, the analysis is still on-going.
+This is a **draft** (version 0.0.4), the analysis is still on-going.
 
 This document focuses on analysing the 2011 Italian census variables to generate a set of transformed variables that can be use for clustering to generate a geodemographic classification. The variables are presented in the table below. The analysis will carry out the following steps:
 
@@ -19,151 +19,149 @@ This document focuses on analysing the 2011 Italian census variables to generate
 2. transformation of extremely skewed variable;
 3. standardisation.
 
-A **key question** still open is whether to include areas with very small population.
 
-
-| Variable   code | Variable description                                                                                                                                                      | Normalisation code | Normalisation description                                                                                                                                        |
-|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| P1              | Popolazione residente - totale                                                                                                                                            |                    | Area (Km2)                                                                                                                                                       |
-| P2              | Popolazione residente - maschi                                                                                                                                            | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P3              | Popolazione residente - femmine                                                                                                                                           | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P4              | Popolazione residente -   celibi/nubili                                                                                                                                   | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P5              | Popolazione residente -   coniugati/e (+ separati/e di fatto)                                                                                                             | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P6              | Popolazione residente -   separati/e legalmente                                                                                                                           | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P7              | Popolazione residente -   vedovi/e                                                                                                                                        | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P8              | Popolazione residente -   divorziati/e                                                                                                                                    | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P9              | Popolazione residente - maschi   celibi                                                                                                                                   | P4                 | Popolazione residente -   celibi/nubili                                                                                                                          |
-| P10             | Popolazione residente - maschi   coniugati o separati di fatto                                                                                                            | P5                 | Popolazione residente -   coniugati/e (+ separati/e di fatto)                                                                                                    |
-| P11             | Popolazione residente - maschi   separati legalmente                                                                                                                      | P6                 | Popolazione residente -   separati/e legalmente                                                                                                                  |
-| P12             | Popolazione residente - maschi   vedovi                                                                                                                                   | P7                 | Popolazione residente -   vedovi/e                                                                                                                               |
-| P13             | Popolazione residente - maschi   divorziati                                                                                                                               | P8                 | Popolazione residente -   divorziati/e                                                                                                                           |
-| P14             | Popolazione residente - età   < 5 anni                                                                                                                                    | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P15             | Popolazione residente - età 5 -   9 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P16             | Popolazione residente - età 10   - 14 anni                                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P17             | Popolazione residente - età 15   - 19 anni                                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P18             | Popolazione residente - età 20   - 24 anni                                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P19             | Popolazione residente - età 25   - 29 anni                                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P20             | Popolazione residente - età 30   - 34 anni                                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P21             | Popolazione residente - età 35   - 39 anni                                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P22             | Popolazione residente - età 40   - 44 anni                                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P23             | Popolazione residente - età 45   - 49 anni                                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P24             | Popolazione residente - età 50   - 54 anni                                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P25             | Popolazione residente - età 55   - 59 anni                                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P26             | Popolazione residente - età 60   - 64 anni                                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P27             | Popolazione residente - età 65   - 69 anni                                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P28             | Popolazione residente - età 70   - 74 anni                                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P29             | Popolazione residente - età   > 74 anni                                                                                                                                   | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P30             | Popolazione residente - maschi   - età < 5 anni                                                                                                                           | P14                | Popolazione residente - età   < 5 anni                                                                                                                           |
-| P31             | Popolazione residente - maschi   - età 5 - 9 anni                                                                                                                         | P15                | Popolazione residente - età 5 -   9 anni                                                                                                                         |
-| P32             | Popolazione residente - maschi   - età 10 - 14 anni                                                                                                                       | P16                | Popolazione residente - età 10   - 14 anni                                                                                                                       |
-| P33             | Popolazione residente - maschi   - età 15 - 19 anni                                                                                                                       | P17                | Popolazione residente - età 15   - 19 anni                                                                                                                       |
-| P34             | Popolazione residente - maschi   - età 20 - 24 anni                                                                                                                       | P18                | Popolazione residente - età 20   - 24 anni                                                                                                                       |
-| P35             | Popolazione residente - maschi   - età 25 - 29 anni                                                                                                                       | P19                | Popolazione residente - età 25   - 29 anni                                                                                                                       |
-| P36             | Popolazione residente - maschi   - età 30 - 34 anni                                                                                                                       | P20                | Popolazione residente - età 30   - 34 anni                                                                                                                       |
-| P37             | Popolazione residente - maschi   - età 35 - 39 anni                                                                                                                       | P21                | Popolazione residente - età 35   - 39 anni                                                                                                                       |
-| P38             | Popolazione residente - maschi   - età 40 - 44 anni                                                                                                                       | P22                | Popolazione residente - età 40   - 44 anni                                                                                                                       |
-| P39             | Popolazione residente - maschi   - età 45 - 49 anni                                                                                                                       | P23                | Popolazione residente - età 45   - 49 anni                                                                                                                       |
-| P40             | Popolazione residente - maschi   - età 50 - 54 anni                                                                                                                       | P24                | Popolazione residente - età 50   - 54 anni                                                                                                                       |
-| P41             | Popolazione residente - maschi   - età 55 - 59 anni                                                                                                                       | P25                | Popolazione residente - età 55   - 59 anni                                                                                                                       |
-| P42             | Popolazione residente - maschi   - età 60 - 64 anni                                                                                                                       | P26                | Popolazione residente - età 60   - 64 anni                                                                                                                       |
-| P43             | Popolazione residente - maschi   - età 65 - 69 anni                                                                                                                       | P27                | Popolazione residente - età 65   - 69 anni                                                                                                                       |
-| P44             | Popolazione residente - maschi   - età 70 - 74 anni                                                                                                                       | P28                | Popolazione residente - età 70   - 74 anni                                                                                                                       |
-| P45             | Popolazione residente - maschi   - età > 74 anni                                                                                                                          | P29                | Popolazione residente - età   > 74 anni                                                                                                                          |
-| P46             | Popolazione residente - totale   di 6 anni e più                                                                                                                          | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P47             | Popolazione residente con   laurea vecchio e nuovo ordinamento + diplomi universitari + diplomi terziari   di tipo non universitario vecchio e nuovo ordinamento          | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P48             | Popolazione residente con   diploma di scuola secondaria superiore (maturità + qualifica)                                                                                 | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P49             | Popolazione residente con media   inferiore                                                                                                                               | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P50             | Popolazione residente con   licenza elementare                                                                                                                            | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P51             | Popolazione residente -   alfabeti                                                                                                                                        | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P52             | Popolazione residente -   analfabeti                                                                                                                                      | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P53             | Popolazione residente - maschi   di 6 anni e più                                                                                                                          | P46                | Popolazione residente - totale   di 6 anni e più                                                                                                                 |
-| P54             | Popolazione residente - maschi   con laurea vecchio e nuovo ordinamento + diplomi universitari + diplomi   terziari di tipo non universitario vecchio e nuovo ordinamento | P47                | Popolazione residente con   laurea vecchio e nuovo ordinamento + diplomi universitari + diplomi terziari   di tipo non universitario vecchio e nuovo ordinamento |
-| P55             | Popolazione residente - maschi   con diploma di scuola secondaria superiore (maturità + qualifica)                                                                        | P48                | Popolazione residente con   diploma di scuola secondaria superiore (maturità + qualifica)                                                                        |
-| P56             | Popolazione residente - maschi   con media inferiore                                                                                                                      | P49                | Popolazione residente con media   inferiore                                                                                                                      |
-| P57             | Popolazione residente - maschi   con licenza elementare                                                                                                                   | P50                | Popolazione residente con   licenza elementare                                                                                                                   |
-| P58             | Popolazione residente - maschi   alfabeti                                                                                                                                 | P51                | Popolazione residente -   alfabeti                                                                                                                               |
-| P59             | Popolazione residente - maschi   analfabeti                                                                                                                               | P52                | Popolazione residente -   analfabeti                                                                                                                             |
-| P60             | Popolazione residente - totale   di 15 anni e più appartenente alle forze di lavoro totale                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P61             | Popolazione residente - totale   di 15 anni e più occupata (FL)                                                                                                           | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P62             | Popolazione residente - totale   di 15 anni e più disoccupata in cerca nuova occupazione                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P64             | Popolazione residente - maschi   di 15 anni e più appartenente alle forze di lavoro                                                                                       | P60                | Popolazione residente - totale   di 15 anni e più appartenente alle forze di lavoro totale                                                                       |
-| P65             | Popolazione residente - maschi   di 15 anni e più occupata (FL)                                                                                                           | P61                | Popolazione residente - totale   di 15 anni e più occupata (FL)                                                                                                  |
-| P66             | Popolazione residente - maschi   di 15 anni e più disoccupata in cerca nuova occupazione                                                                                  | P62                | Popolazione residente - totale   di 15 anni e più disoccupata in cerca nuova occupazione                                                                         |
-| P128            | Popolazione residente - totale   di 15 anni e più non appartenente alle forze di lavoro (NFL)                                                                             | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P129            | Popolazione residente - maschi   di 15 anni e più non appartenente alle forze di lavoro (NFL)                                                                             | P128               | Popolazione residente - totale   di 15 anni e più non appartenente alle forze di lavoro (NFL)                                                                    |
-| P130            | Popolazione residente - totale   di 15 anni e più casalinghi/e                                                                                                            | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P131            | Popolazione residente - totale   di 15 anni e più studenti                                                                                                                | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P132            | Popolazione residente - totale   maschi di 15 anni e più studenti                                                                                                         | P131               | Popolazione residente - totale   di 15 anni e più studenti                                                                                                       |
-| P135            | Popolazione residente - totale   di 15 anni e più in altra condizione                                                                                                     | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P136            | Popolazione residente - totale   maschi di 15 anni e più in altra condizione                                                                                              | P135               | Popolazione residente - totale   di 15 anni e più in altra condizione                                                                                            |
-| P137            | Popolazione residente che si   sposta giornalmente nel comune di dimora abituale                                                                                          | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P138            | Popolazione residente che si   sposta giornalmente fuori del comune di dimora abituale                                                                                    | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P139            | Popolazione residente - totale   di 15 anni e più percettori di reddito da lavoro o capitale                                                                              | P1                 | Popolazione residente - totale                                                                                                                                   |
-| P140            | Popolazione residente - totale   maschi di 15 anni e più percettori di reddito da lavoro o capitale                                                                       | P139               | Popolazione residente - totale   di 15 anni e più percettori di reddito da lavoro o capitale                                                                     |
-| ST1             | Stranieri e apolidi residenti   in Italia - totale                                                                                                                        | P1                 | Popolazione residente - totale                                                                                                                                   |
-| ST2             | Stranieri e apolidi residenti   in Italia - maschi                                                                                                                        | ST1                | Stranieri e apolidi residenti   in Italia - totale                                                                                                               |
-| ST3             | Stranieri e apolidi residenti   in Italia - età 0 - 29 anni                                                                                                               | ST1                | Stranieri e apolidi residenti   in Italia - totale                                                                                                               |
-| ST4             | Stranieri e apolidi residenti   in Italia - età 30 - 54 anni                                                                                                              | ST1                | Stranieri e apolidi residenti   in Italia - totale                                                                                                               |
-| ST5             | Stranieri e apolidi residenti   in Italia - età > 54 anni                                                                                                                 | ST1                | Stranieri e apolidi residenti   in Italia - totale                                                                                                               |
-| ST6             | Stranieri e apolidi residenti   in Italia - maschi - età 0 - 29 anni                                                                                                      | ST3                | Stranieri e apolidi residenti   in Italia - età 0 - 29 anni                                                                                                      |
-| ST7             | Stranieri e apolidi residenti   in Italia - maschi - età 30 - 54 anni                                                                                                     | ST4                | Stranieri e apolidi residenti   in Italia - età 30 - 54 anni                                                                                                     |
-| ST8             | Stranieri e apolidi residenti   in Italia - maschi - età > 54 anni                                                                                                        | ST5                | Stranieri e apolidi residenti   in Italia - età > 54 anni                                                                                                        |
-| ST9             | Stranieri residenti in Italia -   Europa                                                                                                                                  | ST1                | Stranieri e apolidi residenti   in Italia - totale                                                                                                               |
-| ST10            | Stranieri residenti in Italia -   Africa                                                                                                                                  | ST1                | Stranieri e apolidi residenti   in Italia - totale                                                                                                               |
-| ST11            | Stranieri residenti in Italia -   America                                                                                                                                 | ST1                | Stranieri e apolidi residenti   in Italia - totale                                                                                                               |
-| ST12            | Stranieri residenti in Italia -   Asia                                                                                                                                    | ST1                | Stranieri e apolidi residenti   in Italia - totale                                                                                                               |
-| ST13            | Stranieri residenti in Italia -   Oceania                                                                                                                                 | ST1                | Stranieri e apolidi residenti   in Italia - totale                                                                                                               |
-| ST14            | Apolidi residenti in Italia                                                                                                                                               | ST1                | Stranieri e apolidi residenti   in Italia - totale                                                                                                               |
-| ST15            | Stranieri residenti in Italia -   totale                                                                                                                                  | ST1                | Stranieri e apolidi residenti   in Italia - totale                                                                                                               |
-| A2              | Abitazioni occupate da almeno   una persona residente                                                                                                                     |                    | Abitazioni (all) ?                                                                                                                                               |
-| A3              | Abitazioni   vuote e abitazioni occupate solo da persone non residenti                                                                                                    |                    | Abitazioni (all) ?                                                                                                                                               |
-| A5              | Altri tipi di alloggio occupati                                                                                                                                           |                    | Abitazioni (all) ?                                                                                                                                               |
-| A6              | Abitazioni vuote                                                                                                                                                          |                    | Abitazioni (all) ?                                                                                                                                               |
-| A7              | Abitazioni occupate solo da   persone non residenti                                                                                                                       |                    | Abitazioni (all) ?                                                                                                                                               |
-| A44             | Superficie   delle abitazioni occupate da almeno una persona residente                                                                                                    |                    | Area (Km2) ?                                                                                                                                                     |
-| A46             | Famiglie in alloggi in affitto                                                                                                                                            | PF1                | Famiglie residenti - totale                                                                                                                                      |
-| A47             | Famiglie in alloggi di   proprietà                                                                                                                                        | PF1                | Famiglie residenti - totale                                                                                                                                      |
-| A48             | Famiglie che occupano   l’alloggio ad altro titolo                                                                                                                        | PF1                | Famiglie residenti - totale                                                                                                                                      |
-| PF1             | Famiglie residenti - totale                                                                                                                                               |                    | Area (Km2) ?                                                                                                                                                     |
-| PF2             | Famiglie residenti - totale   componenti                                                                                                                                  | PF1                | Famiglie residenti - totale                                                                                                                                      |
-| PF3             | Famiglie residenti - 1   componente                                                                                                                                       | PF1                | Famiglie residenti - totale                                                                                                                                      |
-| PF4             | Famiglie residenti - 2   componenti                                                                                                                                       | PF1                | Famiglie residenti - totale                                                                                                                                      |
-| PF5             | Famiglie residenti - 3   componenti                                                                                                                                       | PF1                | Famiglie residenti - totale                                                                                                                                      |
-| PF6             | Famiglie residenti - 4   componenti                                                                                                                                       | PF1                | Famiglie residenti - totale                                                                                                                                      |
-| PF7             | Famiglie residenti - 5   componenti                                                                                                                                       | PF1                | Famiglie residenti - totale                                                                                                                                      |
-| PF8             | Famiglie residenti - 6 e oltre   componenti                                                                                                                               | PF1                | Famiglie residenti - totale                                                                                                                                      |
-| PF9             | Componenti delle famiglie   residenti di 6 e oltre componenti                                                                                                             | P1                 | Popolazione residente - totale                                                                                                                                   |
-| E1              | Edifici e complessi di edifici   - totale                                                                                                                                 |                    | Area (Km2)                                                                                                                                                       |
-| E2              | Edifici e complessi di edifici   utilizzati                                                                                                                               | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E3              | Edifici ad uso residenziale                                                                                                                                               | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E4              | Edifici e complessi di edifici   (utilizzati) ad uso produttivo, commerciale, direzionale/terziario,   turistico/ricettivo, servizi, altro                                | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E5              | Edifici ad uso residenziale in   muratura portante                                                                                                                        | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E6              | Edifici ad uso residenziale in   calcestruzzo armato                                                                                                                      | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E7              | Edifici ad uso residenziale in   altro materiale (acciaio, legno, ecc.)                                                                                                   | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E8              | Edifici ad uso residenziale   costruiti prima del 1919                                                                                                                    | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E9              | Edifici ad uso residenziale   costruiti dal 1919 al 1945                                                                                                                  | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E10             | Edifici ad uso residenziale   costruiti dal 1946 al 1960                                                                                                                  | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E11             | Edifici ad uso residenziale   costruiti dal 1961 al 1970                                                                                                                  | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E12             | Edifici ad uso residenziale   costruiti dal 1971 al 1980                                                                                                                  | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E13             | Edifici ad uso residenziale   costruiti dal 1981 al 1990                                                                                                                  | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E14             | Edifici ad uso residenziale   costruiti dal 1991 al 2000                                                                                                                  | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E15             | Edifici ad uso residenziale   costruiti dal 2001 al 2005                                                                                                                  | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E16             | Edifici ad uso residenziale   costruiti dopo il 2005                                                                                                                      | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E17             | Edifici ad uso residenziale con   un piano                                                                                                                                | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E18             | Edifici ad uso residenziale con   2 piani                                                                                                                                 | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E19             | Edifici ad uso residenziale con   3 piani                                                                                                                                 | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E20             | Edifici ad uso residenziale con   4 piani o più                                                                                                                           | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E21             | Edifici ad uso residenziale con   un interno                                                                                                                              | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E22             | Edifici ad uso residenziale con   2 interni                                                                                                                               | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E23             | Edifici ad uso residenziale da   3 a 4 interni                                                                                                                            | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E24             | Edifici ad uso residenziale da   5 a 8 interni                                                                                                                            | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E25             | Edifici ad uso residenziale da   9 a 15 interni                                                                                                                           | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E26             | Edifici ad uso residenziale con   16 interni o più                                                                                                                        | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E27             | Totale interni in edifici ad   uso residenziale                                                                                                                           | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E28             | Edifici ad uso residenziale con   stato di conservazione ottimo                                                                                                           | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E29             | Edifici ad uso residenziale con   stato di conservazione buono                                                                                                            | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E30             | Edifici ad uso residenziale con   stato di conservazione mediocre                                                                                                         | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
-| E31             | Edifici ad uso residenziale con   stato di conservazione pessimo                                                                                                          | E1                 | Edifici e complessi di edifici   - totale                                                                                                                        |
+| Variable code | Variable description                                                                                                                                                      | Normalisation code | Normalisation description                                                                                                                                        |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| P1            | Popolazione residente - totale                                                                                                                                            |                    | Area (Km2)                                                                                                                                                       |
+| P2            | Popolazione residente - maschi                                                                                                                                            | P3                 | Popolazione residente - femmine                                                                                                                                  |
+| P3            | Popolazione residente - femmine                                                                                                                                           | P2                 | Popolazione residente - maschi                                                                                                                                   |
+| P4            | Popolazione residente - celibi/nubili                                                                                                                                     | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P5            | Popolazione residente - coniugati/e (+ separati/e di fatto)                                                                                                               | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P6            | Popolazione residente - separati/e legalmente                                                                                                                             | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P7            | Popolazione residente - vedovi/e                                                                                                                                          | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P8            | Popolazione residente - divorziati/e                                                                                                                                      | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P9            | Popolazione residente - maschi celibi                                                                                                                                     | P4                 | Popolazione residente - celibi/nubili                                                                                                                            |
+| P10           | Popolazione residente - maschi coniugati o separati di fatto                                                                                                              | P5                 | Popolazione residente - coniugati/e (+ separati/e di fatto)                                                                                                      |
+| P11           | Popolazione residente - maschi separati legalmente                                                                                                                        | P6                 | Popolazione residente - separati/e legalmente                                                                                                                    |
+| P12           | Popolazione residente - maschi vedovi                                                                                                                                     | P7                 | Popolazione residente - vedovi/e                                                                                                                                 |
+| P13           | Popolazione residente - maschi divorziati                                                                                                                                 | P8                 | Popolazione residente - divorziati/e                                                                                                                             |
+| P14           | Popolazione residente - età < 5 anni                                                                                                                                      | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P15           | Popolazione residente - età 5 - 9 anni                                                                                                                                    | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P16           | Popolazione residente - età 10 - 14 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P17           | Popolazione residente - età 15 - 19 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P18           | Popolazione residente - età 20 - 24 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P19           | Popolazione residente - età 25 - 29 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P20           | Popolazione residente - età 30 - 34 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P21           | Popolazione residente - età 35 - 39 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P22           | Popolazione residente - età 40 - 44 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P23           | Popolazione residente - età 45 - 49 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P24           | Popolazione residente - età 50 - 54 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P25           | Popolazione residente - età 55 - 59 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P26           | Popolazione residente - età 60 - 64 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P27           | Popolazione residente - età 65 - 69 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P28           | Popolazione residente - età 70 - 74 anni                                                                                                                                  | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P29           | Popolazione residente - età > 74 anni                                                                                                                                     | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P30           | Popolazione residente - maschi - età < 5 anni                                                                                                                             | P14                | Popolazione residente - età < 5 anni                                                                                                                             |
+| P31           | Popolazione residente - maschi - età 5 - 9 anni                                                                                                                           | P15                | Popolazione residente - età 5 - 9 anni                                                                                                                           |
+| P32           | Popolazione residente - maschi - età 10 - 14 anni                                                                                                                         | P16                | Popolazione residente - età 10 - 14 anni                                                                                                                         |
+| P33           | Popolazione residente - maschi - età 15 - 19 anni                                                                                                                         | P17                | Popolazione residente - età 15 - 19 anni                                                                                                                         |
+| P34           | Popolazione residente - maschi - età 20 - 24 anni                                                                                                                         | P18                | Popolazione residente - età 20 - 24 anni                                                                                                                         |
+| P35           | Popolazione residente - maschi - età 25 - 29 anni                                                                                                                         | P19                | Popolazione residente - età 25 - 29 anni                                                                                                                         |
+| P36           | Popolazione residente - maschi - età 30 - 34 anni                                                                                                                         | P20                | Popolazione residente - età 30 - 34 anni                                                                                                                         |
+| P37           | Popolazione residente - maschi - età 35 - 39 anni                                                                                                                         | P21                | Popolazione residente - età 35 - 39 anni                                                                                                                         |
+| P38           | Popolazione residente - maschi - età 40 - 44 anni                                                                                                                         | P22                | Popolazione residente - età 40 - 44 anni                                                                                                                         |
+| P39           | Popolazione residente - maschi - età 45 - 49 anni                                                                                                                         | P23                | Popolazione residente - età 45 - 49 anni                                                                                                                         |
+| P40           | Popolazione residente - maschi - età 50 - 54 anni                                                                                                                         | P24                | Popolazione residente - età 50 - 54 anni                                                                                                                         |
+| P41           | Popolazione residente - maschi - età 55 - 59 anni                                                                                                                         | P25                | Popolazione residente - età 55 - 59 anni                                                                                                                         |
+| P42           | Popolazione residente - maschi - età 60 - 64 anni                                                                                                                         | P26                | Popolazione residente - età 60 - 64 anni                                                                                                                         |
+| P43           | Popolazione residente - maschi - età 65 - 69 anni                                                                                                                         | P27                | Popolazione residente - età 65 - 69 anni                                                                                                                         |
+| P44           | Popolazione residente - maschi - età 70 - 74 anni                                                                                                                         | P28                | Popolazione residente - età 70 - 74 anni                                                                                                                         |
+| P45           | Popolazione residente - maschi - età > 74 anni                                                                                                                            | P29                | Popolazione residente - età > 74 anni                                                                                                                            |
+| P46           | Popolazione residente - totale di 6 anni e più                                                                                                                            | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P47           | Popolazione residente con laurea vecchio e nuovo ordinamento + diplomi   universitari + diplomi terziari di tipo non universitario vecchio e nuovo   ordinamento          | P46                | Popolazione residente - totale di 6 anni e più                                                                                                                   |
+| P48           | Popolazione residente con diploma di scuola secondaria superiore   (maturità + qualifica)                                                                                 | P46                | Popolazione residente - totale di 6 anni e più                                                                                                                   |
+| P49           | Popolazione residente con media inferiore                                                                                                                                 | P46                | Popolazione residente - totale di 6 anni e più                                                                                                                   |
+| P50           | Popolazione residente con licenza elementare                                                                                                                              | P46                | Popolazione residente - totale di 6 anni e più                                                                                                                   |
+| P51           | Popolazione residente - alfabeti                                                                                                                                          | P46                | Popolazione residente - totale di 6 anni e più                                                                                                                   |
+| P52           | Popolazione residente - analfabeti                                                                                                                                        | P46                | Popolazione residente - totale di 6 anni e più                                                                                                                   |
+| P53           | Popolazione residente - maschi di 6 anni e più                                                                                                                            | P46                | Popolazione residente - totale di 6 anni e più                                                                                                                   |
+| P54           | Popolazione residente - maschi con laurea vecchio e nuovo ordinamento +   diplomi universitari + diplomi terziari di tipo non universitario vecchio e   nuovo ordinamento | P47                | Popolazione residente con laurea vecchio e nuovo ordinamento + diplomi   universitari + diplomi terziari di tipo non universitario vecchio e nuovo   ordinamento |
+| P55           | Popolazione residente - maschi con diploma di scuola secondaria superiore   (maturità + qualifica)                                                                        | P48                | Popolazione residente con diploma di scuola secondaria superiore   (maturità + qualifica)                                                                        |
+| P56           | Popolazione residente - maschi con media inferiore                                                                                                                        | P49                | Popolazione residente con media inferiore                                                                                                                        |
+| P57           | Popolazione residente - maschi con licenza elementare                                                                                                                     | P50                | Popolazione residente con licenza elementare                                                                                                                     |
+| P58           | Popolazione residente - maschi alfabeti                                                                                                                                   | P51                | Popolazione residente - alfabeti                                                                                                                                 |
+| P59           | Popolazione residente - maschi analfabeti                                                                                                                                 | P52                | Popolazione residente - analfabeti                                                                                                                               |
+| P60           | Popolazione residente - totale di 15 anni e più appartenente alle forze   di lavoro totale                                                                                | P17 + ... + P29    |                                                                                                                                                                  |
+| P61           | Popolazione residente - totale di 15 anni e più occupata (FL)                                                                                                             | P60                | Popolazione residente - totale di 15 anni e più appartenente alle forze   di lavoro totale                                                                       |
+| P62           | Popolazione residente - totale di 15 anni e più disoccupata in cerca   nuova occupazione                                                                                  | P60                | Popolazione residente - totale di 15 anni e più appartenente alle forze   di lavoro totale                                                                       |
+| P64           | Popolazione residente - maschi di 15 anni e più appartenente alle forze   di lavoro                                                                                       | P60                | Popolazione residente - totale di 15 anni e più appartenente alle forze   di lavoro totale                                                                       |
+| P65           | Popolazione residente - maschi di 15 anni e più occupata (FL)                                                                                                             | P61                | Popolazione residente - totale di 15 anni e più occupata (FL)                                                                                                    |
+| P66           | Popolazione residente - maschi di 15 anni e più disoccupata in cerca   nuova occupazione                                                                                  | P62                | Popolazione residente - totale di 15 anni e più disoccupata in cerca   nuova occupazione                                                                         |
+| P128          | Popolazione residente - totale di 15 anni e più non appartenente alle   forze di lavoro (NFL)                                                                             | P60                | Popolazione residente - totale di 15 anni e più appartenente alle forze   di lavoro totale                                                                       |
+| P129          | Popolazione residente - maschi di 15 anni e più non appartenente alle   forze di lavoro (NFL)                                                                             | P128               | Popolazione residente - totale di 15 anni e più non appartenente alle   forze di lavoro (NFL)                                                                    |
+| P130          | Popolazione residente - totale di 15 anni e più casalinghi/e                                                                                                              | P60                | Popolazione residente - totale di 15 anni e più appartenente alle forze   di lavoro totale                                                                       |
+| P131          | Popolazione residente - totale di 15 anni e più studenti                                                                                                                  | P60                | Popolazione residente - totale di 15 anni e più appartenente alle forze   di lavoro totale                                                                       |
+| P132          | Popolazione residente - totale maschi di 15 anni e più studenti                                                                                                           | P131               | Popolazione residente - totale di 15 anni e più studenti                                                                                                         |
+| P135          | Popolazione residente - totale di 15 anni e più in altra condizione                                                                                                       | P60                | Popolazione residente - totale di 15 anni e più appartenente alle forze   di lavoro totale                                                                       |
+| P136          | Popolazione residente - totale maschi di 15 anni e più in altra   condizione                                                                                              | P135               | Popolazione residente - totale di 15 anni e più in altra condizione                                                                                              |
+| P137          | Popolazione residente che si sposta giornalmente nel comune di dimora   abituale                                                                                          | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P138          | Popolazione residente che si sposta giornalmente fuori del comune di   dimora abituale                                                                                    | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P139          | Popolazione residente - totale di 15 anni e più percettori di reddito da   lavoro o capitale                                                                              | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P140          | Popolazione residente - totale maschi di 15 anni e più percettori di   reddito da lavoro o capitale                                                                       | P139               | Popolazione residente - totale di 15 anni e più percettori di reddito da   lavoro o capitale                                                                     |
+| ST1           | Stranieri e apolidi residenti in Italia - totale                                                                                                                          | P1                 | Popolazione residente - totale                                                                                                                                   |
+| ST2           | Stranieri e apolidi residenti in Italia - maschi                                                                                                                          | ST1                | Stranieri e apolidi residenti in Italia - totale                                                                                                                 |
+| ST3           | Stranieri e apolidi residenti in Italia - età 0 - 29 anni                                                                                                                 | ST1                | Stranieri e apolidi residenti in Italia - totale                                                                                                                 |
+| ST4           | Stranieri e apolidi residenti in Italia - età 30 - 54 anni                                                                                                                | ST1                | Stranieri e apolidi residenti in Italia - totale                                                                                                                 |
+| ST5           | Stranieri e apolidi residenti in Italia - età > 54 anni                                                                                                                   | ST1                | Stranieri e apolidi residenti in Italia - totale                                                                                                                 |
+| ST6           | Stranieri e apolidi residenti in Italia - maschi - età 0 - 29 anni                                                                                                        | ST3                | Stranieri e apolidi residenti in Italia - età 0 - 29 anni                                                                                                        |
+| ST7           | Stranieri e apolidi residenti in Italia - maschi - età 30 - 54 anni                                                                                                       | ST4                | Stranieri e apolidi residenti in Italia - età 30 - 54 anni                                                                                                       |
+| ST8           | Stranieri e apolidi residenti in Italia - maschi - età > 54 anni                                                                                                          | ST5                | Stranieri e apolidi residenti in Italia - età > 54 anni                                                                                                          |
+| ST9           | Stranieri residenti in Italia - Europa                                                                                                                                    | ST1                | Stranieri e apolidi residenti in Italia - totale                                                                                                                 |
+| ST10          | Stranieri residenti in Italia - Africa                                                                                                                                    | ST1                | Stranieri e apolidi residenti in Italia - totale                                                                                                                 |
+| ST11          | Stranieri residenti in Italia - America                                                                                                                                   | ST1                | Stranieri e apolidi residenti in Italia - totale                                                                                                                 |
+| ST12          | Stranieri residenti in Italia - Asia                                                                                                                                      | ST1                | Stranieri e apolidi residenti in Italia - totale                                                                                                                 |
+| ST13          | Stranieri residenti in Italia - Oceania                                                                                                                                   | ST1                | Stranieri e apolidi residenti in Italia - totale                                                                                                                 |
+| ST14          | Apolidi residenti in Italia                                                                                                                                               | ST1                | Stranieri e apolidi residenti in Italia - totale                                                                                                                 |
+| ST15          | Stranieri residenti in Italia - totale                                                                                                                                    | ST1                | Stranieri e apolidi residenti in Italia - totale                                                                                                                 |
+| A2            | Abitazioni occupate da almeno una   persona residente                                                                                                                     |                    | Abitazioni (all) ?                                                                                                                                               |
+| A3            | Abitazioni vuote e abitazioni   occupate solo da persone non residenti                                                                                                    |                    | Abitazioni (all) ?                                                                                                                                               |
+| A5            | Altri tipi di alloggio occupati                                                                                                                                           |                    | Abitazioni (all) ?                                                                                                                                               |
+| A6            | Abitazioni vuote                                                                                                                                                          |                    | Abitazioni (all) ?                                                                                                                                               |
+| A7            | Abitazioni occupate solo da persone non residenti                                                                                                                         |                    | Abitazioni (all) ?                                                                                                                                               |
+| A44           | Superficie delle abitazioni occupate   da almeno una persona residente                                                                                                    |                    | Area (Km2) ?                                                                                                                                                     |
+| A46           | Famiglie in alloggi in affitto                                                                                                                                            | A46 + A47 + A48    |                                                                                                                                                                  |
+| A47           | Famiglie in alloggi di proprietà                                                                                                                                          | A46 + A47 + A48    |                                                                                                                                                                  |
+| A48           | Famiglie che occupano l’alloggio ad altro titolo                                                                                                                          | A46 + A47 + A48    |                                                                                                                                                                  |
+| PF1           | Famiglie residenti - totale                                                                                                                                               |                    | Area (Km2) ?                                                                                                                                                     |
+| PF2           | Famiglie residenti - totale componenti                                                                                                                                    | PF1                | Famiglie residenti - totale                                                                                                                                      |
+| PF3           | Famiglie residenti - 1 componente                                                                                                                                         | PF1                | Famiglie residenti - totale                                                                                                                                      |
+| PF4           | Famiglie residenti - 2 componenti                                                                                                                                         | PF1                | Famiglie residenti - totale                                                                                                                                      |
+| PF5           | Famiglie residenti - 3 componenti                                                                                                                                         | PF1                | Famiglie residenti - totale                                                                                                                                      |
+| PF6           | Famiglie residenti - 4 componenti                                                                                                                                         | PF1                | Famiglie residenti - totale                                                                                                                                      |
+| PF7           | Famiglie residenti - 5 componenti                                                                                                                                         | PF1                | Famiglie residenti - totale                                                                                                                                      |
+| PF8           | Famiglie residenti - 6 e oltre componenti                                                                                                                                 | PF1                | Famiglie residenti - totale                                                                                                                                      |
+| PF9           | Componenti delle famiglie residenti di 6 e oltre componenti                                                                                                               | P1                 | Popolazione residente - totale                                                                                                                                   |
+| E1            | Edifici e complessi di edifici - totale                                                                                                                                   |                    | Area (Km2)                                                                                                                                                       |
+| E2            | Edifici e complessi di edifici utilizzati                                                                                                                                 | E1                 | Edifici e complessi di edifici - totale                                                                                                                          |
+| E3            | Edifici ad uso residenziale                                                                                                                                               | E1                 | Edifici e complessi di edifici - totale                                                                                                                          |
+| E4            | Edifici e complessi di edifici (utilizzati) ad uso produttivo,   commerciale, direzionale/terziario, turistico/ricettivo, servizi, altro                                  | E1                 | Edifici e complessi di edifici - totale                                                                                                                          |
+| E5            | Edifici ad uso residenziale in muratura portante                                                                                                                          | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E6            | Edifici ad uso residenziale in calcestruzzo armato                                                                                                                        | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E7            | Edifici ad uso residenziale in altro materiale (acciaio, legno, ecc.)                                                                                                     | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E8            | Edifici ad uso residenziale costruiti prima del 1919                                                                                                                      | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E9            | Edifici ad uso residenziale costruiti dal 1919 al 1945                                                                                                                    | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E10           | Edifici ad uso residenziale costruiti dal 1946 al 1960                                                                                                                    | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E11           | Edifici ad uso residenziale costruiti dal 1961 al 1970                                                                                                                    | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E12           | Edifici ad uso residenziale costruiti dal 1971 al 1980                                                                                                                    | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E13           | Edifici ad uso residenziale costruiti dal 1981 al 1990                                                                                                                    | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E14           | Edifici ad uso residenziale costruiti dal 1991 al 2000                                                                                                                    | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E15           | Edifici ad uso residenziale costruiti dal 2001 al 2005                                                                                                                    | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E16           | Edifici ad uso residenziale costruiti dopo il 2005                                                                                                                        | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E17           | Edifici ad uso residenziale con un piano                                                                                                                                  | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E18           | Edifici ad uso residenziale con 2 piani                                                                                                                                   | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E19           | Edifici ad uso residenziale con 3 piani                                                                                                                                   | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E20           | Edifici ad uso residenziale con 4 piani o più                                                                                                                             | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E21           | Edifici ad uso residenziale con un interno                                                                                                                                | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E22           | Edifici ad uso residenziale con 2 interni                                                                                                                                 | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E23           | Edifici ad uso residenziale da 3 a 4 interni                                                                                                                              | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E24           | Edifici ad uso residenziale da 5 a 8 interni                                                                                                                              | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E25           | Edifici ad uso residenziale da 9 a 15 interni                                                                                                                             | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E26           | Edifici ad uso residenziale con 16 interni o più                                                                                                                          | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E27           | Totale interni in edifici ad uso residenziale                                                                                                                             | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E28           | Edifici ad uso residenziale con stato di conservazione ottimo                                                                                                             | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E29           | Edifici ad uso residenziale con stato di conservazione buono                                                                                                              | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E30           | Edifici ad uso residenziale con stato di conservazione mediocre                                                                                                           | E3                 | Edifici ad uso residenziale                                                                                                                                      |
+| E31           | Edifici ad uso residenziale con stato di conservazione pessimo                                                                                                            | E3                 | Edifici ad uso residenziale                                                                                                                                      |
 
 
 ## Setup
@@ -223,6 +221,16 @@ census_data %>%
   ggplot(aes(x = P1)) +
   geom_histogram() +
   scale_x_log10()
+
+
+census_data %>%
+  ggplot(aes(
+    x = sez_area_km2,
+    y = P1
+  )) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10()
 ```
 
 About 4.8% of enumeration areas have population zero, and about 11.2% have less than 10 residents. Overall, those enumeration areas include about 0.36% of the population. There is an ethical question about whether such areas should be part of a classification. Moreover, these might generate noise in the classification. 
@@ -303,7 +311,9 @@ census_data_no_na %>%
 - E30 and E31 will be aggregated
     - E30	(Edifici ad uso residenziale con stato di conservazione mediocre) 41.15% are zero
     - E31	(Edifici ad uso residenziale con stato di conservazione pessimo) 80.99% are zero
-- PF7 and PF8 will be aggregated, and **PF9** will be removed
+- PF4 and PF5 will be aggregated
+    - as suggested by [Barbieri et al. (2018)](https://rsaiconnect.onlinelibrary.wiley.com/doi/full/10.1111/rsp3.12158)
+- PF6, PF7 and PF8 will be aggregated, and **PF9** will be removed
     - PF7	(Famiglie residenti - 5 componenti) 39.38% are zero
     - PF8	(Famiglie residenti - 6 e oltre componenti) 62.02% are zero
     - PF9	(Componenti delle famiglie residenti di 6 e oltre componenti) 62.02% are zero
@@ -323,7 +333,8 @@ census_data_selected <-
     E14_E15_E16 = E14 + E15 + E16,
     E24_E25_E26 = E24 + E25 + E26,
     E30_E31 = E30 + E31,
-    PF7_PF8 = PF7 + PF8,
+    PF4_PF5 = PF4 + PF5,
+    PF6_PF7_PF8 = PF6 + PF7 + PF8,
     ST10_ST11_ST12_ST13_ST14 = ST10 + ST11 + ST12 + ST13 + ST14
   ) %>% 
   select(
@@ -331,7 +342,9 @@ census_data_selected <-
     -E14, -E15, -E16,
     -E24, -E25, -E26,
     -E30, -E31,
-    -PF7, -PF8, -PF9,
+    -PF4, -PF5, 
+    -PF6, -PF7, -PF8, 
+    -PF9,
     -ST10, -ST11, -ST12, -ST13, -ST14, -ST15
   ) %>% 
   # Also E2 not  as the vast majority of buildings are used
@@ -341,7 +354,8 @@ census_data_selected <-
   relocate(E14_E15_E16, .after = E13) %>% 
   relocate(E24_E25_E26, .after = E23) %>% 
   relocate(E30_E31, .after = E29) %>% 
-  relocate(PF7_PF8, .after = PF6) %>% 
+  relocate(PF4_PF5, .after = PF3) %>% 
+  relocate(PF6_PF7_PF8, .after = PF4_PF5) %>% 
   relocate(ST10_ST11_ST12_ST13_ST14, .after = ST9)
 ```
 
@@ -356,6 +370,7 @@ census_data_norm <-
   #
   #----------------------------------------------
   # Popolazione residente
+  #
   mutate(P9 = if_else(P4 == 0, 0.5, P9 / P4)) %>% 
   mutate(P10 = if_else(P5 == 0, 0.5, P10 / P5)) %>% 
   mutate(P11 = if_else(P6 == 0, 0.5, P11 / P6)) %>% 
@@ -397,32 +412,47 @@ census_data_norm <-
   mutate(P140 = if_else(P139 == 0, 0.5, P140 / P139)) %>% 
   #
   mutate(across(
-    P2:P8, 
+    P4:P8, 
     function(x){if_else(P1 == 0, 0, x / P1)}
   )) %>% 
+  #
+  # P17_P29 used below
+  mutate(
+    P17_P29 = 
+      P17 + P18 + P19 + P20 + P21 + P22 + P23 + 
+      P24 + P25 + P26 + P27 + P28 + P29
+  ) %>% 
   mutate(across(
     P14:P29, 
     function(x){if_else(P1 == 0, 0, x / P1)}
   )) %>% 
+  #
   mutate(across(
-    P46:P52, 
-    function(x){if_else(P1 == 0, 0, x / P1)}
+    P47:P52, 
+    function(x){if_else(P46 == 0, 0, x / P46)}
   )) %>% 
+  #
   mutate(across(
-    P60:P62, 
-    function(x){if_else(P1 == 0, 0, x / P1)}
+    P61:P62, 
+    function(x){if_else(P60 == 0, 0, x / P60)}
   )) %>% 
-  mutate(P128 = if_else(P1 == 0, 0, P128 / P1)) %>% 
-  mutate(P130 = if_else(P1 == 0, 0, P130 / P1)) %>% 
-  mutate(P131 = if_else(P1 == 0, 0, P131 / P1)) %>% 
-  mutate(P135 = if_else(P1 == 0, 0, P135 / P1)) %>% 
+  mutate(P128 = if_else(P60 == 0, 0, P128 / P60)) %>% 
+  mutate(P130 = if_else(P60 == 0, 0, P130 / P60)) %>% 
+  mutate(P131 = if_else(P60 == 0, 0, P131 / P60)) %>% 
+  mutate(P135 = if_else(P60 == 0, 0, P135 / P60)) %>% 
   mutate(across(
     P137:P139, 
     function(x){if_else(P1 == 0, 0, x / P1)}
   )) %>% 
+  #
+  mutate(P60 = if_else(P17_P29 == 0, 0, P60 / P17_P29)) %>% 
+  mutate(P46 = if_else(P1 == 0, 0, P46 / P1)) %>% 
+  mutate(P3 = if_else(P2 == 0, as.numeric(P3), P3 / P2)) %>% 
+  select(-P2, -P17_P29) %>% 
+  #
   dplyr::rename_with(
     function(x){ paste0(x, "_norm") },
-    P2:P140
+    P3:P140
   ) %>% 
   #
   #----------------------------------------------
@@ -462,31 +492,37 @@ census_data_norm <-
   #
   #----------------------------------------------
   # Famiglie in alloggi
+  mutate(A46_A47_A48 = A46 + A47 + A48) %>% 
   mutate(across(
     A46:A48, 
-    function(x){if_else(PF1 == 0, 0, x / PF1)}
+    function(x){if_else(A46_A47_A48 == 0, 0, x / A46_A47_A48)}
   )) %>% 
   dplyr::rename_with(
     function(x){ paste0(x, "_norm") },
     A46:A48
   ) %>% 
+  select(-A46_A47_A48) %>% 
   #
   #----------------------------------------------
   # Famiglie
   mutate(across(
-    PF2:PF7_PF8, 
+    PF2:PF6_PF7_PF8, 
     function(x){if_else(PF1 == 0, 0, x / PF1)}
   )) %>% 
   dplyr::rename_with(
     function(x){ paste0(x, "_norm") },
-    PF2:PF7_PF8
+    PF2:PF6_PF7_PF8
   ) %>% 
   #
   #----------------------------------------------
   # Edifici
   # and normalisation results in a very long left tail, not used
   mutate(across(
-    E3:E30_E31, 
+    E5:E30_E31, 
+    function(x){if_else(E3 == 0, 0, x / E3)}
+  )) %>% 
+  mutate(across(
+    E3:E4, 
     function(x){if_else(E1 == 0, 0, x / E1)}
   )) %>% 
   dplyr::rename_with(
@@ -548,8 +584,8 @@ census_data_norm_skewness %>%
 census_data_norm %>%
   select(
     E1_norm, PF1_norm, P1_norm,  
-    A44_norm, P52_norm, P6_norm, 
-    E27_norm, P8_norm, P46_norm
+    A44_norm, P135_norm, P128_norm, 
+    P3_norm, P131_norm, P46_norm
   ) %>% 
   pivot_longer(everything(), names_to = "variable", values_to = "value") %>% 
   ggplot(aes(x = value)) +
@@ -557,7 +593,22 @@ census_data_norm %>%
   facet_wrap(~variable, scales = "free")
 ```
 
-Apply a `log10` transformation to all variables with skewness above 2 or below -2.
+Apply a $log_{10}$-based transformation to all variables with skewness above 2 or below -2. In particular, the following function is used which adds one unit to the original value to shift the intersection between the function and the x-axis to the origin, thus allowing to assing a value for $x=0$:
+
+$$
+f(x) = log_{10}(x+1)
+$$
+
+```{r}
+plot(
+  seq(0,100,0.1), 
+  log10(seq(0,100,0.1)+1), 
+  type="l",
+  xlab = "x",
+  ylab = "log10(x+1)"
+)
+```
+
 
 ```{r}
 skewed_vars <-
@@ -582,15 +633,15 @@ census_data_norm_unskewed <-
 
 ```{r}
 census_data_norm_unskewed %>% 
-  select(P1_norm_log10:E30_E31_norm_log10) %>% 
-  summarise(across(P1_norm_log10:E30_E31_norm_log10, skewness)) %>% 
-  pivot_longer(P1_norm_log10:E30_E31_norm_log10, names_to = "variable", values_to = "skewness") %>% 
+  select(P1_norm_log10:E30_E31_norm) %>% 
+  summarise(across(P1_norm_log10:E30_E31_norm, skewness)) %>% 
+  pivot_longer(P1_norm_log10:E30_E31_norm, names_to = "variable", values_to = "skewness") %>% 
   slice_max(order_by = skewness, n = 10)
 
 census_data_norm_unskewed %>% 
-  select(P1_norm_log10:E30_E31_norm_log10) %>% 
-  summarise(across(P1_norm_log10:E30_E31_norm_log10, skewness)) %>% 
-  pivot_longer(P1_norm_log10:E30_E31_norm_log10, names_to = "variable", values_to = "skewness") %>% 
+  select(P1_norm_log10:E30_E31_norm) %>% 
+  summarise(across(P1_norm_log10:E30_E31_norm, skewness)) %>% 
+  pivot_longer(P1_norm_log10:E30_E31_norm, names_to = "variable", values_to = "skewness") %>% 
   slice_min(order_by = skewness, n = 10)
 ```
 
@@ -616,13 +667,13 @@ census_data_norm_unskewed_std <-
   census_data_norm_unskewed %>% 
   mutate(
     across(
-      P1_norm_log10:E30_E31_norm_log10,
+      P1_norm_log10:E30_E31_norm,
       function(x){ scale(x) %>% as.vector() }
     )
   ) %>% 
   dplyr::rename_with(
     function(x){ paste0(x, "_std") },
-    P1_norm_log10:E30_E31_norm_log10
+    P1_norm_log10:E30_E31_norm
   )
 ```
 
@@ -633,7 +684,7 @@ census_data_norm_unskewed_std <-
 ```{r}
 vars_names <- 
   census_data_norm_unskewed_std %>%
-  select(P1_norm_log10_std:E30_E31_norm_log10_std) %>% 
+  select(P1_norm_log10_std:E30_E31_norm_std) %>% 
   colnames()
 
 for (i in 0:floor(length(vars_names)/9)) {
@@ -651,6 +702,7 @@ for (i in 0:floor(length(vars_names)/9)) {
 ```
 
 
+
 ## Save new values
 
 ```{r}
@@ -659,7 +711,7 @@ colnames(census_data_norm_unskewed_std)
 
 ```{r}
 census_data_norm_unskewed_std %>% 
-  write_csv("../storage/dati-cpa_2011_all-trans-v0_0_3.csv")
+  write_csv("../storage/dati-cpa_2011_all-trans-v0_0_4.csv")
 ```
 
 
@@ -668,10 +720,19 @@ census_data_norm_unskewed_std %>%
 
 This is a **draft**, the analysis is still on-going.
 
-There is still a lot of very skewed variables. Those will probably need to be combined or dropped. 
+There is still skewed variables. Those will need to be revised. 
 
 
 
 ## Acknowledgements
 
 This analysis uses data from [ISTAT](https://www.istat.it/it/archivio/104317) distributed under [CC BY 3.0 IT](https://creativecommons.org/licenses/by/3.0/it/deed.en) (see also [legal notice](https://www.istat.it/it/note-legali)).
+
+
+
+# Session info
+
+```{r}
+sessionInfo()
+```
+
