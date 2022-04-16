@@ -166,7 +166,7 @@ pre code {
 
 <h1 class="title toc-ignore">Clustering</h1>
 <h4 class="author">Stefano De Sabbata</h4>
-<h4 class="date">2022-04-14 20:42:27</h4>
+<h4 class="date">2022-04-15 23:57:23</h4>
 
 </div>
 
@@ -183,15 +183,15 @@ library(sf)</code></pre>
 <p>Load the <a href="100-prep/111-classification-variable-selection.html">selected census variables</a>.</p>
 <pre class="r"><code>census_data_trans_selected &lt;-
   read_csv(
-    &quot;../storage/dati-cpa_2011_all-trans-selected-v0_0_3.csv&quot;,
-    col_types = paste(c(rep(&quot;c&quot;, 12), rep(&quot;d&quot;, 125)), collapse=&quot;&quot;)
+    &quot;../storage/dati-cpa_2011_all-trans-selected-v0_0_4.csv&quot;,
+    col_types = paste(c(rep(&quot;c&quot;, 12), rep(&quot;d&quot;, 116)), collapse=&quot;&quot;)
   )</code></pre>
 </div>
 <div id="clustering" class="section level2">
 <h2>Clustering</h2>
 <pre class="r"><code>census_data_kmeans_k08 &lt;- 
   census_data_trans_selected %&gt;%
-  select(P1_norm_log10_std:E30_E31_norm_log10_std) %&gt;%
+  select(P1_norm_log10_std:E30_E31_norm_std) %&gt;%
   stats::kmeans(
     centers = 8, iter.max = 5000,
     algorithm = &quot;Lloyd&quot;
@@ -206,11 +206,11 @@ census_data_ieac_k08 &lt;-
 <div id="save-values" class="section level2">
 <h2>Save values</h2>
 <pre class="r"><code>census_data_ieac_k08 %&gt;% 
-  write_csv(&quot;../storage/ieac_k08-with-vars-v0_0_3.csv&quot;) 
+  write_csv(&quot;../storage/ieac_k08-with-vars-v0_0_4.csv&quot;) 
 
 census_data_ieac_k08 %&gt;% 
   select(CODREG:CODASC, ieac_k08) %&gt;% 
-  write_csv(&quot;../storage/ieac_k08-no-vars-v0_0_3.csv&quot;) 
+  write_csv(&quot;../storage/ieac_k08-no-vars-v0_0_4.csv&quot;) 
 
 enum_areas &lt;- readRDS( &quot;../storage/italian-enumeration-areas-2011.rds&quot;)
 census_data_ieac_k08_geo &lt;-
@@ -221,14 +221,66 @@ census_data_ieac_k08_geo &lt;-
   )</code></pre>
 <pre><code>## Joining, by = &quot;SEZ2011&quot;</code></pre>
 <pre class="r"><code>census_data_ieac_k08_geo %&gt;% 
-  saveRDS(&quot;../storage/ieac_k08-with-vars-v0_0_3.rds&quot;)
+  saveRDS(&quot;../storage/ieac_k08-with-vars-v0_0_4.rds&quot;)
 
 census_data_ieac_k08_geo %&gt;% 
-  write_sf(&quot;../storage/ieac_k08-with-vars-v0_0_3.geojson&quot;)
+  write_sf(&quot;../storage/ieac_k08-with-vars-v0_0_4.geojson&quot;)
 
-dir.create(&quot;../storage/ieac_k08-with-vars-v0_0_3&quot;)
+dir.create(&quot;../storage/ieac_k08-with-vars-v0_0_4&quot;)
 census_data_ieac_k08_geo %&gt;% 
-  write_sf(&quot;../storage/ieac_k08-with-vars-v0_0_3/ieac_k08-with-vars-v0_0_3.shp&quot;)</code></pre>
+  write_sf(&quot;../storage/ieac_k08-with-vars-v0_0_4/ieac_k08-with-vars-v0_0_4.shp&quot;)</code></pre>
+</div>
+<div id="conclusions" class="section level2">
+<h2>Conclusions</h2>
+<p>This is a <strong>draft</strong>, the analysis is still on-going.</p>
+</div>
+<div id="acknowledgements" class="section level2">
+<h2>Acknowledgements</h2>
+<p>This analysis uses data from <a href="https://www.istat.it/it/archivio/104317">ISTAT</a> distributed under <a href="https://creativecommons.org/licenses/by/3.0/it/deed.en">CC BY 3.0 IT</a> (see also <a href="https://www.istat.it/it/note-legali">legal notice</a>).</p>
+</div>
+<div id="session-info" class="section level1">
+<h1>Session info</h1>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 4.1.1 (2021-08-10)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 20.04.4 LTS
+## 
+## Matrix products: default
+## BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.8.so
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+##  [1] sf_1.0-3        knitr_1.36      magrittr_2.0.1  forcats_0.5.1  
+##  [5] stringr_1.4.0   dplyr_1.0.7     purrr_0.3.4     readr_2.0.2    
+##  [9] tidyr_1.1.4     tibble_3.1.5    ggplot2_3.3.5   tidyverse_1.3.1
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_1.0.7         lubridate_1.8.0    class_7.3-19       assertthat_0.2.1  
+##  [5] digest_0.6.28      utf8_1.2.2         R6_2.5.1           cellranger_1.1.0  
+##  [9] backports_1.3.0    reprex_2.0.1       evaluate_0.14      e1071_1.7-9       
+## [13] httr_1.4.2         pillar_1.6.4       rlang_0.4.12       readxl_1.3.1      
+## [17] rstudioapi_0.13    jquerylib_0.1.4    rmarkdown_2.11     bit_4.0.4         
+## [21] munsell_0.5.0      proxy_0.4-26       broom_0.7.9        compiler_4.1.1    
+## [25] modelr_0.1.8       xfun_0.27          pkgconfig_2.0.3    htmltools_0.5.2   
+## [29] tidyselect_1.1.1   fansi_0.5.0        crayon_1.4.1       tzdb_0.2.0        
+## [33] dbplyr_2.1.1       withr_2.4.2        grid_4.1.1         jsonlite_1.7.2    
+## [37] gtable_0.3.0       lifecycle_1.0.1    DBI_1.1.1          units_0.7-2       
+## [41] scales_1.1.1       KernSmooth_2.23-20 vroom_1.5.5        cli_3.1.0         
+## [45] stringi_1.7.5      fs_1.5.0           xml2_1.3.2         bslib_0.3.1       
+## [49] ellipsis_0.3.2     generics_0.1.1     vctrs_0.3.8        tools_4.1.1       
+## [53] bit64_4.0.5        glue_1.4.2         hms_1.1.1          parallel_4.1.1    
+## [57] fastmap_1.1.0      yaml_2.2.1         colorspace_2.0-2   classInt_0.4-3    
+## [61] rvest_1.0.2        haven_2.4.3        sass_0.4.0</code></pre>
 </div>
 
 

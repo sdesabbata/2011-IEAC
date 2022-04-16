@@ -27,8 +27,8 @@ Load the [selected census variables](100-prep/111-classification-variable-select
 ```{r}
 census_data_trans_selected <-
   read_csv(
-    "../storage/dati-cpa_2011_all-trans-selected-v0_0_3.csv",
-    col_types = paste(c(rep("c", 12), rep("d", 125)), collapse="")
+    "../storage/dati-cpa_2011_all-trans-selected-v0_0_4.csv",
+    col_types = paste(c(rep("c", 12), rep("d", 116)), collapse="")
   )
 ```
 
@@ -37,7 +37,7 @@ census_data_trans_selected <-
 ```{r}
 census_data_kmeans_k08 <- 
   census_data_trans_selected %>%
-  select(P1_norm_log10_std:E30_E31_norm_log10_std) %>%
+  select(P1_norm_log10_std:E30_E31_norm_std) %>%
   stats::kmeans(
     centers = 8, iter.max = 5000,
     algorithm = "Lloyd"
@@ -54,11 +54,11 @@ census_data_ieac_k08 <-
 
 ```{r}
 census_data_ieac_k08 %>% 
-  write_csv("../storage/ieac_k08-with-vars-v0_0_3.csv") 
+  write_csv("../storage/ieac_k08-with-vars-v0_0_4.csv") 
 
 census_data_ieac_k08 %>% 
   select(CODREG:CODASC, ieac_k08) %>% 
-  write_csv("../storage/ieac_k08-no-vars-v0_0_3.csv") 
+  write_csv("../storage/ieac_k08-no-vars-v0_0_4.csv") 
 
 enum_areas <- readRDS( "../storage/italian-enumeration-areas-2011.rds")
 census_data_ieac_k08_geo <-
@@ -69,12 +69,33 @@ census_data_ieac_k08_geo <-
   )
 
 census_data_ieac_k08_geo %>% 
-  saveRDS("../storage/ieac_k08-with-vars-v0_0_3.rds")
+  saveRDS("../storage/ieac_k08-with-vars-v0_0_4.rds")
 
 census_data_ieac_k08_geo %>% 
-  write_sf("../storage/ieac_k08-with-vars-v0_0_3.geojson")
+  write_sf("../storage/ieac_k08-with-vars-v0_0_4.geojson")
 
-dir.create("../storage/ieac_k08-with-vars-v0_0_3")
+dir.create("../storage/ieac_k08-with-vars-v0_0_4")
 census_data_ieac_k08_geo %>% 
-  write_sf("../storage/ieac_k08-with-vars-v0_0_3/ieac_k08-with-vars-v0_0_3.shp")
+  write_sf("../storage/ieac_k08-with-vars-v0_0_4/ieac_k08-with-vars-v0_0_4.shp")
 ```
+
+
+
+## Conclusions
+
+This is a **draft**, the analysis is still on-going.
+
+
+
+## Acknowledgements
+
+This analysis uses data from [ISTAT](https://www.istat.it/it/archivio/104317) distributed under [CC BY 3.0 IT](https://creativecommons.org/licenses/by/3.0/it/deed.en) (see also [legal notice](https://www.istat.it/it/note-legali)).
+
+
+
+# Session info
+
+```{r}
+sessionInfo()
+```
+
