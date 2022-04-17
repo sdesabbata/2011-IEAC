@@ -27,8 +27,8 @@ Load the [selected census variables](50-prep/111-classification-variable-selecti
 ```{r}
 census_data_trans_selected <-
   read_csv(
-    "../storage/dati-cpa_2011_all-trans-selected-v0_0_3.csv",
-    col_types = paste(c(rep("c", 12), rep("d", 125)), collapse="")
+    "../storage/dati-cpa_2011_all-trans-selected-v0_0_4.csv",
+    col_types = paste(c(rep("c", 12), rep("d", 116)), collapse="")
   )
 ```
 
@@ -38,7 +38,7 @@ census_data_trans_selected <-
 # Data for elbow method
 data_for_testing <-
   census_data_trans_selected %>%
-  dplyr::select(P1_norm_log10_std:E30_E31_norm_log10_std) %>% 
+  dplyr::select(P1_norm_log10_std:E30_E31_norm_std) %>% 
   slice_sample(prop = 0.01)
 ```
 
@@ -87,19 +87,40 @@ testing_gap <-
 plot(2:50, testing_wcss[2:50], type="b", xlab="Number of Clusters", 
      ylab="WCSS", xlim=c(1,50)) +
 abline(v = 8, col = "red") +
-abline(v = 25, col = "red")
+abline(v = 20, col = "red")
 ```
 
 ```{r}
 plot(2:50, testing_silhouette[2:50], type="b", xlab="Number of Clusters", 
      ylab="Silhouette", xlim=c(1,50)) +
 abline(v = 8, col = "red") +
-abline(v = 25, col = "red")
+abline(v = 20, col = "red")
 ```
 
 ```{r, eval=FALSE}
 plot(2:50, testing_gap[["Tab"]][2:50, "gap"], type="b", xlab="Number of Clusters", 
      ylab="Gap", xlim=c(1,50)) +
 abline(v = 8, col = "red") +
-abline(v = 25, col = "red")
+abline(v = 20, col = "red")
 ```
+
+## Conclusions
+
+This is a **draft**, the analysis is still on-going.
+
+The analysis above suggests that 8 and 20 might be reasonably good as number of clusters to create the geodemographic classification.
+
+
+
+## Acknowledgements
+
+This analysis uses data from [ISTAT](https://www.istat.it/it/archivio/104317) distributed under [CC BY 3.0 IT](https://creativecommons.org/licenses/by/3.0/it/deed.en) (see also [legal notice](https://www.istat.it/it/note-legali)).
+
+
+
+# Session info
+
+```{r}
+sessionInfo()
+```
+

@@ -166,7 +166,7 @@ pre code {
 
 <h1 class="title toc-ignore">Clustering</h1>
 <h4 class="author">Stefano De Sabbata</h4>
-<h4 class="date">2022-04-15 23:57:23</h4>
+<h4 class="date">2022-04-16 09:10:31</h4>
 
 </div>
 
@@ -209,17 +209,33 @@ census_data_ieac_k08 &lt;-
   write_csv(&quot;../storage/ieac_k08-with-vars-v0_0_4.csv&quot;) 
 
 census_data_ieac_k08 %&gt;% 
-  select(CODREG:CODASC, ieac_k08) %&gt;% 
-  write_csv(&quot;../storage/ieac_k08-no-vars-v0_0_4.csv&quot;) 
-
-enum_areas &lt;- readRDS( &quot;../storage/italian-enumeration-areas-2011.rds&quot;)
+  select(CODREG:CODASC, ieac_k08) %&gt;%
+  write_csv(&quot;../storage/ieac_k08-no-vars-v0_0_4.csv&quot;) </code></pre>
+<pre class="r"><code>enum_areas &lt;- readRDS( &quot;../storage/italian-enumeration-areas-2011.rds&quot;)
 census_data_ieac_k08_geo &lt;-
   enum_areas %&gt;%
   left_join(
     census_data_ieac_k08 %&gt;% 
     select(CODREG:CODASC, ieac_k08)
-  )</code></pre>
-<pre><code>## Joining, by = &quot;SEZ2011&quot;</code></pre>
+  ) %&gt;% 
+  left_join(
+    read_csv(
+      &quot;../storage/dati-cpa_2011_all.csv&quot;,
+      col_types = paste(c(rep(&quot;c&quot;, 12), rep(&quot;i&quot;, 140)), collapse=&quot;&quot;)
+    ) %&gt;% 
+    left_join(
+      read_csv(
+        &quot;../storage/italian-enumeration-areas-2011-size-km2.csv&quot;,
+        col_types = &quot;cd&quot;
+      )
+    ) %&gt;% 
+    select(SEZ2011, P1)
+  ) %&gt;% 
+  mutate(ieac_k08 = if_else(P1 == 0 | P1 &gt;= 10, ieac_k08, NA_character_)) %&gt;% 
+  select(-P1)</code></pre>
+<pre><code>## Joining, by = &quot;SEZ2011&quot;
+## Joining, by = &quot;SEZ2011&quot;
+## Joining, by = &quot;SEZ2011&quot;</code></pre>
 <pre class="r"><code>census_data_ieac_k08_geo %&gt;% 
   saveRDS(&quot;../storage/ieac_k08-with-vars-v0_0_4.rds&quot;)
 

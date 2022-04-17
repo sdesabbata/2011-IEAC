@@ -196,49 +196,6 @@ census_data <-
 
 ## Data checking
 
-### Population
-
-```{r}
-census_data %>% 
-  filter(P1 == 0) %>% 
-  count() %>% 
-  mutate(prop = (n / nrow(census_data))*100)
-
-census_data %>% 
-  filter(P1 > 0 & P1 <= 10) %>% 
-  count() %>% 
-  mutate(prop = (n / nrow(census_data))*100)
-
-census_data %>% 
-  mutate(small_area = if_else(P1 <= 10, "small", "not small")) %>% 
-  group_by(small_area) %>% 
-  summarise(P1 = sum(P1)) %>% 
-  ungroup() %>% 
-  mutate(P1pc = (P1 / sum(P1)) * 100)
-
-census_data %>% 
-  filter(P1 > 0) %>% 
-  ggplot(aes(x = P1)) +
-  geom_histogram() +
-  scale_x_log10()
-
-
-census_data %>%
-  ggplot(aes(
-    x = sez_area_km2,
-    y = P1
-  )) +
-  geom_point() +
-  scale_x_log10() +
-  scale_y_log10()
-```
-
-About 4.8% of enumeration areas have population zero, and about 11.2% have less than 10 residents. Overall, those enumeration areas include about 0.36% of the population. There is an ethical question about whether such areas should be part of a classification. Moreover, these might generate noise in the classification. 
-
-In a preliminary cluster analysis, areas with no residents had been discarded.
-
-[After further investigation and discussion](https://github.com/sdesabbata/2011-IEAC/issues/1), it seems that those areas are actually mostly industrial areas, which might be of interest as a cluster on its own right. As such all areas will be retained.
-
 
 
 ### Missing values
@@ -273,9 +230,76 @@ There seem to be 2,400 enumeration areas without information for `E5`, `E6` and 
 ```{r}
 census_data_no_na <-
   census_data %>% 
-  filter(if_any(P1:E31, ~!is.na(.)))
+  filter(if_all(P1:E31, ~!is.na(.)))
 ```
 
+### Population
+
+```{r}
+census_data_no_na_prop_0 <-
+  census_data_no_na %>% 
+  filter(P1 == 0) %>% 
+  count() %>% 
+  mutate(prop = (n / nrow(census_data_no_na))*100) %>% 
+  pull(prop) %>% 
+  round(digits = 2)
+
+census_data_no_na_prop_1 <-
+  census_data_no_na %>% 
+  filter(P1 == 1) %>% 
+  count() %>% 
+  mutate(prop = (n / nrow(census_data_no_na))*100) %>% 
+  pull(prop) %>% 
+  round(digits = 2)
+
+census_data_no_na_prop_1to9 <-
+  census_data_no_na %>% 
+  filter(P1 > 0 & P1 < 10) %>% 
+  count() %>% 
+  mutate(prop = (n / nrow(census_data_no_na))*100) %>% 
+  pull(prop) %>% 
+  round(digits = 2)
+```
+
+```{r}
+census_data_no_na_small_not_pop <-
+  census_data_no_na %>% 
+  filter(P1 > 0) %>% 
+  mutate(small_not_pop = if_else(P1 < 10, "small", "not small")) %>% 
+  group_by(small_not_pop) %>% 
+  summarise(P1 = sum(P1)) %>% 
+  ungroup() %>% 
+  mutate(P1pc = (P1 / sum(P1)) * 100)
+
+census_data_no_na_small_pop <-
+  census_data_no_na_small_not_pop %>% 
+  filter(small_not_pop == "small") %>% 
+  pull(P1pc) %>% 
+  round(digits = 2)
+
+census_data_no_na_small_not_pop
+```
+
+```{r}
+census_data_no_na %>% 
+  filter(P1 > 0) %>% 
+  ggplot(aes(x = P1)) +
+  geom_histogram() +
+  scale_x_log10()
+
+census_data_no_na %>%
+  ggplot(aes(
+    x = sez_area_km2,
+    y = P1
+  )) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+About `r census_data_no_na_prop_0`% of enumeration areas have population zero, about `r census_data_no_na_prop_1to9`% have less than 10 residents, with about `r census_data_no_na_prop_0`% having only 1 resident. Overall, those enumeration areas include about `r census_data_no_na_small_pop`% of the population. There is an ethical question about whether such areas should be part of a classification. Moreover, these might generate noise in the classification. 
+
+[After further investigation and discussion](https://github.com/sdesabbata/2011-IEAC/issues/1), it seems that those areas are actually mostly industrial areas, which might be of interest as a cluster on its own right. As such all areas will be retained for classification but removed from outputs.
 
 
 ### Low values

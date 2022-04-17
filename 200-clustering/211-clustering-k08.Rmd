@@ -57,16 +57,33 @@ census_data_ieac_k08 %>%
   write_csv("../storage/ieac_k08-with-vars-v0_0_4.csv") 
 
 census_data_ieac_k08 %>% 
-  select(CODREG:CODASC, ieac_k08) %>% 
+  select(CODREG:CODASC, ieac_k08) %>%
   write_csv("../storage/ieac_k08-no-vars-v0_0_4.csv") 
+```
 
+```{r}
 enum_areas <- readRDS( "../storage/italian-enumeration-areas-2011.rds")
 census_data_ieac_k08_geo <-
   enum_areas %>%
   left_join(
     census_data_ieac_k08 %>% 
     select(CODREG:CODASC, ieac_k08)
-  )
+  ) %>% 
+  left_join(
+    read_csv(
+      "../storage/dati-cpa_2011_all.csv",
+      col_types = paste(c(rep("c", 12), rep("i", 140)), collapse="")
+    ) %>% 
+    left_join(
+      read_csv(
+        "../storage/italian-enumeration-areas-2011-size-km2.csv",
+        col_types = "cd"
+      )
+    ) %>% 
+    select(SEZ2011, P1)
+  ) %>% 
+  mutate(ieac_k08 = if_else(P1 == 0 | P1 >= 10, ieac_k08, NA_character_)) %>% 
+  select(-P1)
 
 census_data_ieac_k08_geo %>% 
   saveRDS("../storage/ieac_k08-with-vars-v0_0_4.rds")
