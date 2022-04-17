@@ -12,9 +12,12 @@ Still very much a work in progress! :sweat_smile:
 - Clustering
     - [Determine the number of clusters](200-clustering/201-number-of-clusters.html)
     - [First attempt at enumeration areas clustering](200-clustering/211-clustering-k08.html)
-- Result
-    - Check out the [Shiny interactive map demo for Friuli-Venezia Giulia](https://sdesabbata.shinyapps.io/ieac-v0_0_3-map-fvg/) 
-        - *(it takes a few seconds to load)*
+- Results
+    - Check out the preliminary map below
+        
+### Preliminary classification (v0.0.4)
+
+![](300-maps/ieac_k08-with-vars-v0_0_4-300dpi.png)
         
 ## Reproducibility
 
