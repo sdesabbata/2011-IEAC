@@ -42,7 +42,9 @@ census_data_kmeans_k08 <-
     centers = 8, iter.max = 5000,
     algorithm = "Lloyd"
   )
+```
 
+```{r}
 census_data_ieac_k08 <- 
   census_data_trans_selected %>%
   tibble::add_column(
@@ -51,6 +53,12 @@ census_data_ieac_k08 <-
 ```
 
 ## Save values
+
+```{r}
+census_data_kmeans_k08 %>% 
+  saveRDS("../storage/ieac_k08_kmeans_object.rds")
+```
+
 
 ```{r}
 census_data_ieac_k08 %>% 
