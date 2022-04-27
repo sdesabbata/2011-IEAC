@@ -11,7 +11,7 @@ Still very much a work in progress! :sweat_smile:
     - [Census variables selection](100-prep/111-classification-variable-selection.html)
 - Clustering
     - [Determine the number of clusters](200-clustering/201-number-of-clusters.html)
-    - [First attempt at enumeration areas clustering](200-clustering/211-clustering-k08.html)
+    - [First attempt at enumeration areas clustering](200-clustering/221-clustering-k08.html)
 - Results
     - Coming soon...
         
