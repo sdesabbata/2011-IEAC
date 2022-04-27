@@ -1,0 +1,221 @@
+---
+title: "Clustering"
+author: "Stefano De Sabbata"
+date: "`r lubridate::now()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+```{r libraries, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(magrittr)
+library(knitr)
+library(sf)
+library(patchwork)
+library(ggrepel)
+```
+
+
+
+## Data
+
+Load the [selected census variables](100-prep/111-classification-variable-selection.html).
+
+```{r}
+census_data_trans_selected <-
+  read_csv(
+    "../storage/dati-cpa_2011_all-trans-selected-v0_0_4.csv",
+    col_types = paste(c(rep("c", 12), rep("d", 116)), collapse="")
+  )
+```
+
+
+## Sensitivity analysis
+
+Assess WCSS and BCSS as each variable is iteratively removed. Where the removal of a variable leads lower WCSS and higher BCSS than average, that indicates that removing that variable from the clustering process would lead to more homogeneousand distinct clusters.
+
+```{r}
+ieac_k08_v0_0_4_sensitivity_analysis <-
+  readRDS("../storage/ieac_k08_v0_0_4_sensitivity_analysis.rds")
+```
+
+
+### Plot
+
+```{r, fig.height=7, fig.width=7}
+sensitivity_plot_wcss <-
+  ieac_k08_v0_0_4_sensitivity_analysis %>% 
+  ggplot(aes(
+    x = wcss,
+    y = census_variable, 
+    group=1
+  )) +
+  geom_point(stat='summary', fun.x=sum) +
+  stat_summary(fun.x=sum, geom="line") +
+  theme_bw()
+
+sensitivity_plot_bcss <-
+  ieac_k08_v0_0_4_sensitivity_analysis %>% 
+  ggplot(aes(
+    x = bcss,
+    y = census_variable, 
+    group=1
+  )) +
+  geom_point(stat='summary', fun.x=sum) +
+  stat_summary(fun.x=sum, geom="line") +
+  theme_bw()
+
+sensitivity_plot_wcss + sensitivity_plot_bcss
+```
+
+Highlight variables in the top-left corner, as where the removal of a variable leads lower WCSS and higher BCSS than average, that indicates that removing that variable from the clustering process would lead to more homogeneous and distinct clusters.
+
+```{r, fig.height=7, fig.width=7}
+ieac_k08_v0_0_4_sensitivity_analysis %>%
+  mutate(
+    plot_label = if_else(
+      ((bcss) > ((0.75 * wcss) - 192500)),
+      census_variable, ""
+    )
+  ) %>% 
+  ggplot(aes(
+    x = wcss,
+    y = bcss,
+    label = plot_label
+  )) +
+  geom_point() +  
+  geom_text_repel(
+    colour = "#999999", 
+    size = 3,
+    force = 1,
+    force_pull = 0.1,
+    box.padding = 0.5,
+    min.segment.length = 0,
+    segment.curvature = -0.1
+  ) + 
+  theme_bw()
+```
+
+
+
+### Variables to exclude
+
+| Variable code | Variable description                                                                                                                                                      | Normalisation code | Normalisation description                                                                                                                                        |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| P8            | Popolazione residente - divorziati/e                                                                                                                                      | P1                 | Popolazione residente - totale                                                                                                                                   |
+| P30           | Popolazione residente - maschi - età < 5 anni                                                                                                                             | P14                | Popolazione residente - età < 5 anni                                                                                                                             |
+| P36           | Popolazione residente - maschi - età 30 - 34 anni                                                                                                                         | P20                | Popolazione residente - età 30 - 34 anni                                                                                                                         |
+| P66           | Popolazione residente - maschi di 15 anni e più disoccupata in cerca   nuova occupazione                                                                                  | P62                | Popolazione residente - totale di 15 anni e più disoccupata in cerca   nuova occupazione                                                                         |
+| ST7           | Stranieri e apolidi residenti in Italia - maschi - età 30 - 54 anni                                                                                                       | ST4                | Stranieri e apolidi residenti in Italia - età 30 - 54 anni                                                                                                       |
+
+
+
+## Clustering
+
+```{r}
+census_data_kmeans_k08 <- 
+  census_data_trans_selected %>%
+  select(P1_norm_log10_std:E30_E31_norm_std) %>%
+  select(
+    -P8_norm_log10_std, -P30_norm_std, 
+    -P36_norm_std, -P66_norm_std,
+    -ST7_norm_std
+  ) %>% 
+  kmeans(
+    centers = 8, iter.max = 5000,
+    algorithm = "Lloyd"
+  )
+```
+
+```{r}
+census_data_ieac_k08 <- 
+  census_data_trans_selected %>%
+  tibble::add_column(
+    ieac_k08 = census_data_kmeans_k08 %$% cluster %>% as.character()
+  )
+```
+
+## Save values
+
+```{r}
+census_data_kmeans_k08 %>% 
+  saveRDS("../storage/ieac_k08_kmeans_object-v0_0_4_6.rds")
+```
+
+
+```{r}
+census_data_ieac_k08 <-
+  census_data_ieac_k08 %>% 
+  left_join(
+    read_csv(
+      "../storage/dati-cpa_2011_all.csv",
+      col_types = paste(c(rep("c", 12), rep("i", 140)), collapse="")
+    ) %>% 
+    select(SEZ2011, P1)
+  ) %>% 
+  mutate(ieac_k08 = if_else(P1 == 0 | P1 >= 10, ieac_k08, NA_character_))
+
+# Check
+census_data_ieac_k08 %>% 
+  filter(P1 > 0) %>% 
+  pull(P1) %>% 
+  min()
+
+census_data_ieac_k08 <-
+  census_data_ieac_k08 %>% 
+  select(-P1)
+```
+
+```{r}
+census_data_ieac_k08 %>% 
+  write_csv("../storage/ieac_k08-with-vars-v0_0_4_6.csv") 
+
+census_data_ieac_k08 %>% 
+  select(CODREG:CODASC, ieac_k08) %>%
+  write_csv("../storage/ieac_k08-no-vars-v0_0_4_6.csv") 
+```
+
+```{r}
+census_data_ieac_k08_geo <-
+  readRDS( "../storage/italian-enumeration-areas-2011.rds") %>%
+  left_join(
+    census_data_ieac_k08 %>% 
+    select(CODREG:CODASC, ieac_k08)
+  )
+
+census_data_ieac_k08_geo %>% 
+  saveRDS("../storage/ieac_k08-with-vars-v0_0_4_6.rds")
+
+census_data_ieac_k08_geo %>% 
+  write_sf("../storage/ieac_k08-with-vars-v0_0_4_6.geojson")
+
+dir.create("../storage/ieac_k08-with-vars-v0_0_4_6")
+census_data_ieac_k08_geo %>% 
+  write_sf("../storage/ieac_k08-with-vars-v0_0_4_6/ieac_k08-with-vars-v0_0_4_6.shp")
+```
+
+
+
+## Conclusions
+
+This is a **draft**, the analysis is still on-going.
+
+
+
+## Acknowledgements
+
+This analysis uses data from [ISTAT](https://www.istat.it/it/archivio/104317) distributed under [CC BY 3.0 IT](https://creativecommons.org/licenses/by/3.0/it/deed.en) (see also [legal notice](https://www.istat.it/it/note-legali)).
+
+
+
+# Session info
+
+```{r}
+sessionInfo()
+```
+

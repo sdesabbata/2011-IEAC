@@ -13,26 +13,26 @@ library(sf)
 library(tmap)
 
 preliminary_clustering_map <-
-  read_sf("storage/ieac_k08-with-vars-v0_0_4/ieac_k08-with-vars-v0_0_4.shp") %>% 
+  read_sf("storage/ieac_k08-with-vars-v0_0_4_6/ieac_k08-with-vars-v0_0_4_6.shp") %>% 
   # mutate(ieac_k08 = as.character(ieac_k08)) %>% 
   mutate(
     ieac_k08 = recode(
       ieac_k08,
         `1` = "C",
-        `2` = "F",
-        `3` = "G",
-        `4` = "D",
+        `2` = "D",
+        `3` = "F",
+        `4` = "A",
         `5` = "B",
-        `6` = "E",
-        `7` = "A",
-        `8` = "G"
+        `6` = "G",
+        `7` = "E",
+        `8` = "H"
       )
   ) %>% 
   tmap::tm_shape() +
   # Define the choropleth aesthetic
   tmap::tm_polygons(
     "ieac_k08",
-    title = "Preliminary\nclusters\n(v0.0.4)",
+    title = "Preliminary\nclusters\n(v0.0.4-6)",
     palette = "Set1",
     legend.show = TRUE,
     border.alpha = 0,
@@ -56,7 +56,7 @@ preliminary_clustering_map <-
 # Save image
 tmap_save(
   preliminary_clustering_map, 
-  "storage/ieac_k08-with-vars-v0_0_4-300dpi.png", 
+  "storage/ieac_k08-with-vars-v0_0_4_6-300dpi.png", 
   width = 210, height = 298, asp=0,
   units = "mm", dpi = 300
   )
@@ -64,7 +64,7 @@ tmap_save(
 # Save image
 tmap_save(
   preliminary_clustering_map, 
-  "storage/ieac_k08-with-vars-v0_0_4-2400dpi.png", 
+  "storage/ieac_k08-with-vars-v0_0_4_6-2400dpi.png", 
   width = 210, height = 298, asp=0,
   units = "mm", dpi = 2400
 )
