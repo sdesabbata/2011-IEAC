@@ -16,6 +16,7 @@ library(ggplot2)
 
 vars_with_preliminary_clusters <-
   read_csv("storage/ieac_k08-with-vars-v0_0_4_6.csv") %>% 
+  filter(!is.na(ieac_k08)) %>% 
   mutate(
     ieac_k08 = recode(
       ieac_k08,
