@@ -18,6 +18,9 @@ library(knitr)
 library(sf)
 library(patchwork)
 library(ggrepel)
+
+# devtools::install_github("sdesabbata/sbclust")
+library(sbclust)
 ```
 
 
@@ -79,7 +82,7 @@ Highlight variables in the top-left corner, as where the removal of a variable l
 ieac_k20_v0_0_4_sensitivity_analysis %>%
   mutate(
     plot_label = if_else(
-      ((bcss) > ((1.0 * wcss) - 234500)),
+      ((bcss) > ((1.0 * wcss) - 234500)) | (bcss > 93500),
       census_variable, ""
     )
   ) %>% 
@@ -88,7 +91,6 @@ ieac_k20_v0_0_4_sensitivity_analysis %>%
     y = bcss,
     label = plot_label
   )) +
-  geom_point() +  
   geom_text_repel(
     colour = "#999999", 
     size = 3,
@@ -98,6 +100,7 @@ ieac_k20_v0_0_4_sensitivity_analysis %>%
     min.segment.length = 0,
     segment.curvature = -0.1
   ) + 
+  geom_point() +  
   theme_bw()
 ```
 
@@ -115,24 +118,47 @@ ieac_k20_v0_0_4_sensitivity_analysis %>%
 | E11           | Edifici ad uso residenziale costruiti dal 1961 al 1970                                                                                                                    | E3                 | Edifici ad uso residenziale                                                                                                                                      |
 | E23           | Edifici ad uso residenziale da 3 a 4 interni                                                                                                                              | E3                 | Edifici ad uso residenziale                                                                                                                                      |
 
-Based on the analysis above, all variables P30 to P45 will be removed. All other variables will still be retained.
+Based on the analysis above, all variables P30 to P45 will be removed, along with P46. All other variables will still be retained.
 
 ## Clustering
 
 ```{r}
-census_data_kmeans_k20 <- 
-  census_data_trans_selected %>%
-  select(P1_norm_log10_std:E30_E31_norm_std) %>%
-  select(
-    -P30_norm_std, -P31_norm_std, -P32_norm_std, -P33_norm_std,
-    -P34_norm_std, -P35_norm_std, -P36_norm_std, -P37_norm_std,
-    -P38_norm_std, -P39_norm_std, -P40_norm_std, -P41_norm_std,
-    -P42_norm_std, -P43_norm_std, -P44_norm_std, -P45_norm_std
-  ) %>% 
-  kmeans(
-    centers = 20, iter.max = 5000,
-    algorithm = "Lloyd"
+census_data_kmeans_k20_RData_file <-
+  "../storage/ieac_k20_kmeans_object-v0_0_4_16.RData"
+
+if (file.exists(census_data_kmeans_k20_RData_file)) {
+  load(census_data_kmeans_k20_RData_file)
+} else{
+  
+  census_data_kmeans_k20 <- 
+    census_data_trans_selected %>%
+    select(P1_norm_log10_std:E30_E31_norm_std) %>%
+    select(
+      -P30_norm_std, -P31_norm_std, -P32_norm_std, -P33_norm_std,
+      -P34_norm_std, -P35_norm_std, -P36_norm_std, -P37_norm_std,
+      -P38_norm_std, -P39_norm_std, -P40_norm_std, -P41_norm_std,
+      -P42_norm_std, -P43_norm_std, -P44_norm_std, -P45_norm_std,
+      -P46_norm_log10_std
+    ) %>% 
+    # kmeans(
+    #   centers = 20,
+    #   iter.max = 5000
+    # )
+    e1071::bclust(
+      centers = 20,
+      base.centers = 50,
+      iter.base = 100,
+      iter.max = 50000,
+      resample = FALSE,
+      algorithm="Lloyd"
+    )
+
+  save(
+    census_data_kmeans_k20, 
+    file = census_data_kmeans_k20_RData_file
   )
+  
+}
 ```
 
 ```{r}
@@ -143,46 +169,51 @@ centers_hclust  <-
       dist(), 
     "ward.D2"
   )
-plot(centers_hclust, hang =- 1) + abline(h = 10, col = "red") + abline(h = 5, col = "red")
+plot(centers_hclust, hang =- 1)
 ```
 
+Generate cluster names.
+
 ```{r}
-cut_h10 <- cutree(centers_hclust, h = 10) %>% as.vector()
-cut_h05 <- cutree(centers_hclust, h = 5) %>% as.vector()
-cut_h00 <- cutree(centers_hclust, h = 0) %>% as.vector()
+#cut_tk03 <- cutree(centers_hclust, k = 3) %>% as.vector()
+cut_tk06 <- cutree(centers_hclust, k = 6) %>% as.vector()
+cut_tk20 <- cutree(centers_hclust, k = 20) %>% as.vector()
 
-clust_names <- rep(NA, length(cut_h00))
+clust_names <- rep(NA, length(cut_tk20))
 
-id_at_h10 <- 1
-for(i_h10 in unique(cut_h10)){
-  at_h05 <- cut_h05[cut_h10 == i_h10]
-  id_at_h05 <- 1
-  for(i_h05 in unique(at_h05)){
-    at_h00 <- cut_h00[cut_h05 == i_h05]
-    id_at_h00 <- 1
-    if(length(at_h00) == 1){
-      i_h00 <- at_h00[1]
-      clust_name <- paste0(id_at_h10, letters[id_at_h05])
-      clust_names[i_h00] <- clust_name
-      cat(i_h00, " - ", clust_name, "\n")
+# id_at_tk03 <- 1
+# for(i_tk03 in unique(cut_tk03)){
+#   at_tk06 <- cut_tk06[cut_tk03 == i_tk03]
+  id_at_tk06 <- 1
+  #for(i_tk06 in unique(at_tk06)){
+  for(i_tk06 in unique(cut_tk06)){
+    at_tk20 <- cut_tk20[cut_tk06 == i_tk06]
+    id_at_tk20 <- 1
+    if(length(at_tk20) == 1){
+      i_tk20 <- at_tk20[1]
+      #clust_name <- paste0(id_at_tk03, letters[id_at_tk06])
+      clust_name <- paste0(id_at_tk06)
+      clust_names[i_tk20] <- clust_name
+      cat(i_tk20, " - ", clust_name, "\n")
     }else{
-      for(i_h00 in at_h00){
-        clust_name <- paste0(id_at_h10, letters[id_at_h05], id_at_h00)
-        clust_names[i_h00] <- clust_name
-        cat(i_h00, " - ", clust_name, "\n")
-        id_at_h00 <- id_at_h00 + 1
+      for(i_tk20 in at_tk20){
+        #clust_name <- paste0(id_at_tk03, letters[id_at_tk06], id_at_tk20)
+        clust_name <- paste0(id_at_tk06, letters[id_at_tk20])
+        clust_names[i_tk20] <- clust_name
+        cat(i_tk20, " - ", clust_name, "\n")
+        id_at_tk20 <- id_at_tk20 + 1
       }
     }
-    id_at_h05 <- id_at_h05 + 1
+    id_at_tk06 <- id_at_tk06 + 1
   }
-  id_at_h10 <- id_at_h10 + 1
-}
+#   id_at_tk03 <- id_at_tk03 + 1
+# }
 rm(
-  at_h00, at_h05,
+  at_tk20, at_tk06,
   clust_name,
-  cut_h00, cut_h05, cut_h10, 
-  id_at_h00, id_at_h05, id_at_h10,
-  i, i_h00, i_h05, i_h10
+  cut_tk20, cut_tk06, #cut_tk03, 
+  id_at_tk20, id_at_tk06, #id_at_tk03,
+  i, i_tk20, i_tk06 #, i_tk03
 )
 ```
 
@@ -190,21 +221,19 @@ rm(
 census_data_ieac_k20 <- 
   census_data_trans_selected %>%
   tibble::add_column(
-    ieac_k20 = census_data_kmeans_k20 %$% cluster %>% as.character()
+    ieac_k20 = census_data_kmeans_k20 %$% cluster
   ) %>% 
   mutate(
     ieac_k20h = clust_names[ieac_k20]
+  ) %>% 
+  mutate(
+     ieac_k20 = ieac_k20 %>% as.character()
   )
 ```
 
 
 
 ## Save values
-
-```{r}
-census_data_kmeans_k20 %>% 
-  saveRDS("../storage/ieac_k20_kmeans_object-v0_0_4_6.rds")
-```
 
 
 ```{r}
@@ -217,7 +246,10 @@ census_data_ieac_k20 <-
     ) %>% 
     select(SEZ2011, P1)
   ) %>% 
-  mutate(ieac_k20 = if_else(P1 == 0 | P1 >= 10, ieac_k20, NA_character_))
+  mutate(
+    ieac_k20 = if_else(P1 == 0 | P1 >= 10, ieac_k20, NA_character_),
+    ieac_k20h = if_else(P1 == 0 | P1 >= 10, ieac_k20h, NA_character_)
+  )
 
 # Check
 census_data_ieac_k20 %>% 
@@ -232,11 +264,11 @@ census_data_ieac_k20 <-
 
 ```{r}
 census_data_ieac_k20 %>% 
-  write_csv("../storage/ieac_k20-with-vars-v0_0_4_6.csv") 
+  write_csv("../storage/ieac_k20-with-vars-v0_0_4_16.csv") 
 
 census_data_ieac_k20 %>% 
-  select(CODREG:CODASC, ieac_k20) %>%
-  write_csv("../storage/ieac_k20-no-vars-v0_0_4_6.csv") 
+  select(CODREG:CODASC, ieac_k20, ieac_k20h) %>%
+  write_csv("../storage/ieac_k20-no-vars-v0_0_4_16.csv") 
 ```
 
 ```{r}
@@ -248,14 +280,14 @@ census_data_ieac_k20_geo <-
   )
 
 census_data_ieac_k20_geo %>% 
-  saveRDS("../storage/ieac_k20-with-vars-v0_0_4_6.rds")
+  saveRDS("../storage/ieac_k20-with-vars-v0_0_4_16.rds")
 
 census_data_ieac_k20_geo %>% 
-  write_sf("../storage/ieac_k20-with-vars-v0_0_4_6.geojson")
+  write_sf("../storage/ieac_k20-with-vars-v0_0_4_16.geojson")
 
-dir.create("../storage/ieac_k20-with-vars-v0_0_4_6")
+dir.create("../storage/ieac_k20-with-vars-v0_0_4_16")
 census_data_ieac_k20_geo %>% 
-  write_sf("../storage/ieac_k20-with-vars-v0_0_4_6/ieac_k20-with-vars-v0_0_4_6.shp")
+  write_sf("../storage/ieac_k20-with-vars-v0_0_4_16/ieac_k20-with-vars-v0_0_4_16.shp")
 ```
 
 
