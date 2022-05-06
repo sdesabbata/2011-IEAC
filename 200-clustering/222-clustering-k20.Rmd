@@ -18,9 +18,7 @@ library(knitr)
 library(sf)
 library(patchwork)
 library(ggrepel)
-
-# devtools::install_github("sdesabbata/sbclust")
-library(sbclust)
+library(e1071)
 ```
 
 
