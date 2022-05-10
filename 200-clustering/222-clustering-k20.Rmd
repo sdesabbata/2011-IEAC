@@ -122,7 +122,7 @@ Based on the analysis above, all variables P30 to P45 will be removed, along wit
 
 ```{r}
 census_data_kmeans_k20_RData_file <-
-  "../storage/ieac_k20_kmeans_object-v0_0_4_16.RData"
+  "../storage/ieac_k20_kmeans_object-v0_0_4_18.RData"
 
 if (file.exists(census_data_kmeans_k20_RData_file)) {
   load(census_data_kmeans_k20_RData_file)
@@ -262,11 +262,11 @@ census_data_ieac_k20 <-
 
 ```{r}
 census_data_ieac_k20 %>% 
-  write_csv("../storage/ieac_k20-with-vars-v0_0_4_16.csv") 
+  write_csv("../storage/ieac_k20-with-vars-v0_0_4_18.csv") 
 
 census_data_ieac_k20 %>% 
   select(CODREG:CODASC, ieac_k20, ieac_k20h) %>%
-  write_csv("../storage/ieac_k20-no-vars-v0_0_4_16.csv") 
+  write_csv("../storage/ieac_k20-no-vars-v0_0_4_18.csv") 
 ```
 
 ```{r}
@@ -278,14 +278,14 @@ census_data_ieac_k20_geo <-
   )
 
 census_data_ieac_k20_geo %>% 
-  saveRDS("../storage/ieac_k20-with-vars-v0_0_4_16.rds")
+  saveRDS("../storage/ieac_k20-with-vars-v0_0_4_18.rds")
 
 census_data_ieac_k20_geo %>% 
-  write_sf("../storage/ieac_k20-with-vars-v0_0_4_16.geojson")
+  write_sf("../storage/ieac_k20-with-vars-v0_0_4_18.geojson")
 
-dir.create("../storage/ieac_k20-with-vars-v0_0_4_16")
+dir.create("../storage/ieac_k20-with-vars-v0_0_4_18")
 census_data_ieac_k20_geo %>% 
-  write_sf("../storage/ieac_k20-with-vars-v0_0_4_16/ieac_k20-with-vars-v0_0_4_16.shp")
+  write_sf("../storage/ieac_k20-with-vars-v0_0_4_18/ieac_k20-with-vars-v0_0_4_18.shp")
 ```
 
 
