@@ -122,7 +122,7 @@ Based on the analysis above, all variables P30 to P45 will be removed, along wit
 
 ```{r}
 census_data_kmeans_k20_RData_file <-
-  "../storage/ieac_k20_kmeans_object-v0_0_4_18.RData"
+  "../storage/ieac_k20_kmeans_object-v0_0_4_20.RData"
 
 if (file.exists(census_data_kmeans_k20_RData_file)) {
   load(census_data_kmeans_k20_RData_file)
@@ -138,18 +138,19 @@ if (file.exists(census_data_kmeans_k20_RData_file)) {
       -P42_norm_std, -P43_norm_std, -P44_norm_std, -P45_norm_std,
       -P46_norm_log10_std
     ) %>% 
-    # kmeans(
-    #   centers = 20,
-    #   iter.max = 5000
-    # )
-    e1071::bclust(
+    kmeans(
       centers = 20,
-      base.centers = 50,
-      iter.base = 100,
       iter.max = 50000,
-      resample = FALSE,
       algorithm="Lloyd"
     )
+    # e1071::bclust(
+    #   centers = 20,
+    #   base.centers = 50,
+    #   iter.base = 100,
+    #   iter.max = 50000,
+    #   resample = FALSE,
+    #   algorithm="Lloyd"
+    # )
 
   save(
     census_data_kmeans_k20, 
@@ -167,51 +168,58 @@ centers_hclust  <-
       dist(), 
     "ward.D2"
   )
-plot(centers_hclust, hang =- 1)
+plot(centers_hclust, hang =- 1) + 
+  abline(h = 7, col = "red") +
+  abline(h = 12, col = "red")
 ```
 
 Generate cluster names.
 
 ```{r}
-#cut_tk03 <- cutree(centers_hclust, k = 3) %>% as.vector()
-cut_tk06 <- cutree(centers_hclust, k = 6) %>% as.vector()
+cut_tk04 <- cutree(centers_hclust, k = 4) %>% as.vector()
+cut_tk10 <- cutree(centers_hclust, k = 10) %>% as.vector()
 cut_tk20 <- cutree(centers_hclust, k = 20) %>% as.vector()
 
 clust_names <- rep(NA, length(cut_tk20))
 
-# id_at_tk03 <- 1
-# for(i_tk03 in unique(cut_tk03)){
-#   at_tk06 <- cut_tk06[cut_tk03 == i_tk03]
-  id_at_tk06 <- 1
-  #for(i_tk06 in unique(at_tk06)){
-  for(i_tk06 in unique(cut_tk06)){
-    at_tk20 <- cut_tk20[cut_tk06 == i_tk06]
+id_at_tk04 <- 1
+for(i_tk04 in unique(cut_tk04)){
+  at_tk10 <- cut_tk10[cut_tk04 == i_tk04]
+  id_at_tk10 <- 1
+  for(i_tk10 in unique(at_tk10)){
+  #for(i_tk10 in unique(cut_tk10)){
+    at_tk20 <- cut_tk20[cut_tk10 == i_tk10]
     id_at_tk20 <- 1
     if(length(at_tk20) == 1){
       i_tk20 <- at_tk20[1]
-      #clust_name <- paste0(id_at_tk03, letters[id_at_tk06])
-      clust_name <- paste0(id_at_tk06)
+      if(length(at_tk10) == 1){
+        clust_name <- paste0(id_at_tk04)
+      } else {
+        clust_name <- paste0(id_at_tk04, letters[id_at_tk10])
+      }
+      #clust_name <- paste0(id_at_tk10)
       clust_names[i_tk20] <- clust_name
       cat(i_tk20, " - ", clust_name, "\n")
     }else{
       for(i_tk20 in at_tk20){
-        #clust_name <- paste0(id_at_tk03, letters[id_at_tk06], id_at_tk20)
-        clust_name <- paste0(id_at_tk06, letters[id_at_tk20])
+        clust_name <- paste0(id_at_tk04, letters[id_at_tk10], id_at_tk20)
+        #clust_name <- paste0(id_at_tk10, letters[id_at_tk20])
         clust_names[i_tk20] <- clust_name
         cat(i_tk20, " - ", clust_name, "\n")
         id_at_tk20 <- id_at_tk20 + 1
       }
     }
-    id_at_tk06 <- id_at_tk06 + 1
+    id_at_tk10 <- id_at_tk10 + 1
   }
-#   id_at_tk03 <- id_at_tk03 + 1
-# }
+  id_at_tk04 <- id_at_tk04 + 1
+}
+
 rm(
-  at_tk20, at_tk06,
+  at_tk20, at_tk10,
   clust_name,
-  cut_tk20, cut_tk06, #cut_tk03, 
-  id_at_tk20, id_at_tk06, #id_at_tk03,
-  i, i_tk20, i_tk06 #, i_tk03
+  cut_tk20, cut_tk10, cut_tk04, 
+  id_at_tk20, id_at_tk10, id_at_tk04,
+  i_tk20, i_tk10, i_tk04
 )
 ```
 
@@ -262,11 +270,11 @@ census_data_ieac_k20 <-
 
 ```{r}
 census_data_ieac_k20 %>% 
-  write_csv("../storage/ieac_k20-with-vars-v0_0_4_18.csv") 
+  write_csv("../storage/ieac_k20-with-vars-v0_0_4_20.csv") 
 
 census_data_ieac_k20 %>% 
   select(CODREG:CODASC, ieac_k20, ieac_k20h) %>%
-  write_csv("../storage/ieac_k20-no-vars-v0_0_4_18.csv") 
+  write_csv("../storage/ieac_k20-no-vars-v0_0_4_20.csv") 
 ```
 
 ```{r}
@@ -278,14 +286,14 @@ census_data_ieac_k20_geo <-
   )
 
 census_data_ieac_k20_geo %>% 
-  saveRDS("../storage/ieac_k20-with-vars-v0_0_4_18.rds")
+  saveRDS("../storage/ieac_k20-with-vars-v0_0_4_20.rds")
 
 census_data_ieac_k20_geo %>% 
-  write_sf("../storage/ieac_k20-with-vars-v0_0_4_18.geojson")
+  write_sf("../storage/ieac_k20-with-vars-v0_0_4_20.geojson")
 
-dir.create("../storage/ieac_k20-with-vars-v0_0_4_18")
+dir.create("../storage/ieac_k20-with-vars-v0_0_4_20")
 census_data_ieac_k20_geo %>% 
-  write_sf("../storage/ieac_k20-with-vars-v0_0_4_18/ieac_k20-with-vars-v0_0_4_18.shp")
+  write_sf("../storage/ieac_k20-with-vars-v0_0_4_20/ieac_k20-with-vars-v0_0_4_20.shp")
 ```
 
 

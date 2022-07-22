@@ -15,7 +15,7 @@ library(ggplot2)
 # Data --------------------------------------------------------------------
 
 vars_with_preliminary_clusters <-
-  read_csv("storage/ieac_k20-with-vars-v0_0_4_16.csv") %>% 
+  read_csv("storage/ieac_k20-with-vars-v0_0_4_20.csv") %>% 
   filter(!is.na(ieac_k20h))
 
 vars_cluster_averages_long <-
@@ -82,13 +82,13 @@ vars_cluster_averages_heatmap <-
     )
   ) +
   ggplot2::geom_tile(aes(fill = average_class)) +
-  ggplot2::xlab("Cluster (ieac_k20, v0.0.4-16)") + 
+  ggplot2::xlab("Cluster (ieac_k20, v0.0.4-20)") + 
   ggplot2::ylab("Variable") +
   ggplot2::scale_fill_brewer(palette = "RdBu") +
   ggplot2::theme_bw()
 
 ggsave(
-  "storage/ieac_k20_v0_0_4_16_cluster_averages.png", 
+  "storage/ieac_k20_v0_0_4_20_cluster_averages.png", 
   plot = vars_cluster_averages_heatmap, 
   width = 210, height = 596, 
   units = "mm", dpi = 300
